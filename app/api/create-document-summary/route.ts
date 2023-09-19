@@ -1,4 +1,6 @@
-import { VectorDBQAChain, APIChain } from 'langchain/chains';
+// import 'dotenv/config';
+import fs from 'fs';
+// import { VectorDBQAChain, APIChain } from 'langchain/chains';
 // import { FaissStore } from "langchain/vectorstores/faiss";
 import { RetrievalQAChain } from 'langchain/chains';
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
@@ -7,8 +9,6 @@ import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { OpenAI } from 'langchain/llms/openai';
 import { InMemoryStore } from 'langchain/storage/in_memory';
 import { HNSWLib } from 'langchain/vectorstores/hnswlib';
-// import 'dotenv/config';
-import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
@@ -21,15 +21,13 @@ export async function POST(req: Request) {
     const tempFileName = path.join(os.tmpdir(), 'temp_uploaded_pdf.pdf');
     fs.writeFileSync(tempFileName, pdfBuffer);
 
+    console.log('file created called', tempFileName);
     const pdfLoader = new PDFLoader(tempFileName);
     const docs = await pdfLoader.load();
 
-    // After you're done, you might want to delete the temp file
-    fs.unlinkSync(tempFileName);
-
     const llm = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
-      temperature: 0.9
+      temperature: 0
     } as any);
 
     const underlyingEmbeddings = new OpenAIEmbeddings();
@@ -57,10 +55,17 @@ export async function POST(req: Request) {
     const vectorStoreRetriever = vectorStore.asRetriever();
 
     const chain = RetrievalQAChain.fromLLM(llm, vectorStoreRetriever);
+    console.log('querying chain');
     const res = await chain.call({
-      query: 'What is the document about?'
+      query: 'Summarise the document in 100 words or less?'
     });
     console.log({ res });
+
+    // delete the temp file
+    fs.unlinkSync(tempFileName);
+    return new Response(JSON.stringify(res), {
+      status: 200
+    });
   } else {
     return new Response('File not found', {
       headers: { Allow: 'POST' },

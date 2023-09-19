@@ -1,10 +1,11 @@
 'use client';
 
 import { postData } from '@/utils/helpers';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 const PDFUploader: React.FC = () => {
   const pdfInputRef = useRef<HTMLInputElement>(null);
+  const [pdfSummary, setPdfSummary] = useState();
 
   const handleFileChange = async () => {
     const file = pdfInputRef.current?.files?.[0];
@@ -32,6 +33,9 @@ const PDFUploader: React.FC = () => {
         contentType: 'multipart/form-data'
       });
       console.log('Server Response:', response);
+      if (response) {
+        setPdfSummary(response);
+      }
     } catch (error) {
       console.error('Error uploading PDF:', error);
       alert('Upload failed. Please try again later.');
@@ -39,7 +43,7 @@ const PDFUploader: React.FC = () => {
   };
 
   return (
-    <div>
+    <>
       <input
         type="file"
         ref={pdfInputRef}
@@ -48,7 +52,8 @@ const PDFUploader: React.FC = () => {
         accept=".pdf"
         onChange={handleFileChange}
       />
-    </div>
+      {pdfSummary && <div>{pdfSummary}</div>}
+    </>
   );
 };
 
