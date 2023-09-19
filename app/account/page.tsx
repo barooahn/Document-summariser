@@ -41,12 +41,14 @@ export default async function Account() {
     const supabase = createServerActionClient<Database>({ cookies });
     const session = await getSession();
     const user = session?.user;
-    const { error } = await supabase
-      .from('users')
-      .update({ full_name: newName })
-      .eq('id', user?.id);
-    if (error) {
-      console.log(error);
+    if (user?.id) {
+      const { error } = await supabase
+        .from('users')
+        .update({ full_name: newName })
+        .eq('id', user.id);
+      if (error) {
+        console.log(error);
+      }
     }
     revalidatePath('/account');
   };
