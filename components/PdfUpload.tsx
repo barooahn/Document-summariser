@@ -3,9 +3,13 @@
 import { postData } from '@/utils/helpers';
 import React, { useRef, useState } from 'react';
 
+type PdfResponse = {
+  text: string;
+};
+
 const PDFUploader: React.FC = () => {
   const pdfInputRef = useRef<HTMLInputElement>(null);
-  const [pdfSummary, setPdfSummary] = useState();
+  const [pdfSummary, setPdfSummary] = useState<PdfResponse>();
 
   const handleFileChange = async () => {
     const file = pdfInputRef.current?.files?.[0];
@@ -52,7 +56,7 @@ const PDFUploader: React.FC = () => {
         accept=".pdf"
         onChange={handleFileChange}
       />
-      {pdfSummary && <div>{pdfSummary}</div>}
+      {pdfSummary && <div>{pdfSummary.text}</div>}
     </>
   );
 };
