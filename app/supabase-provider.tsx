@@ -23,7 +23,7 @@ export default function SupabaseProvider({
   useEffect(() => {
     const {
       data: { subscription }
-    } = supabase.auth.onAuthStateChange((event) => {
+    } = supabase.auth.onAuthStateChange((event: string) => {
       if (event === 'SIGNED_IN') router.refresh();
     });
 

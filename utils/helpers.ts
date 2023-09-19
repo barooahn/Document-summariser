@@ -1,5 +1,6 @@
 import { Database } from '@/types_db';
 
+
 type Price = Database['public']['Tables']['prices']['Row'];
 
 export const getURL = () => {
@@ -16,18 +17,22 @@ export const getURL = () => {
 
 export const postData = async ({
   url,
-  data
+  data,
+  contentType = 'application/json'
 }: {
   url: string;
-  data?: { price: Price };
+  data?: any;
+  contentType?: string;
 }) => {
   console.log('posting,', url, data);
 
+  const isJSON = contentType === 'application/json';
+
   const res = await fetch(url, {
     method: 'POST',
-    headers: new Headers({ 'Content-Type': 'application/json' }),
+    headers: new Headers({ 'Content-Type': contentType }),
     credentials: 'same-origin',
-    body: JSON.stringify(data)
+    body: isJSON ? JSON.stringify(data) : data
   });
 
   if (!res.ok) {
@@ -37,10 +42,4 @@ export const postData = async ({
   }
 
   return res.json();
-};
-
-export const toDateTime = (secs: number) => {
-  var t = new Date('1970-01-01T00:30:00Z'); // Unix epoch start.
-  t.setSeconds(secs);
-  return t;
 };
