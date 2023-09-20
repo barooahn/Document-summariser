@@ -11,6 +11,7 @@
     "generate-types": "npx supabase gen types typescript --project-id YOUR_PROJECT_ID --schema public > types_db.ts"
   },
   "dependencies": {
+    "@dropzone-ui/react": "^7.0.4",
     "@stripe/stripe-js": "^1.53.0",
     "@supabase/auth-helpers-nextjs": "^0.7.0",
     "@supabase/auth-ui-react": "^0.4.2",

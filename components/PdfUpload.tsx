@@ -1,62 +1,60 @@
 'use client';
 
-import { postData } from '@/utils/helpers';
-import React, { useRef, useState } from 'react';
+import { Dropzone, ExtFile, FileMosaic } from '@dropzone-ui/react';
+import React, { useState } from 'react';
 
-type PdfResponse = {
-  text: string;
+type ServerResponse = {
+  success: boolean;
+  message: string;
+  payload: {
+    chainResponse: {
+      text: string;
+    };
+  };
 };
-
 const PDFUploader: React.FC = () => {
-  const pdfInputRef = useRef<HTMLInputElement>(null);
-  const [pdfSummary, setPdfSummary] = useState<PdfResponse>();
+  const [pdfSummary, setPdfSummary] = useState<ServerResponse | null>(null);
+  const [files, setFiles] = useState<ExtFile[]>([]);
 
-  const handleFileChange = async () => {
-    const file = pdfInputRef.current?.files?.[0];
+  const handleFilesChange = (incomingFiles: ExtFile[]) => {
+    const { uploadStatus, errors, xhr } = incomingFiles[0];
 
-    // Check if a file was selected
-    if (!file) {
-      alert('Please select a PDF to upload.');
-      return;
+    setFiles(incomingFiles);
+    if (uploadStatus === 'success' && xhr?.response) {
+      const parsedResponse: ServerResponse = JSON.parse(xhr?.response);
+      setPdfSummary(parsedResponse);
     }
-
-    // Validate file extension for .pdf
-    if (!file.name.endsWith('.pdf')) {
-      alert('The selected file is not a PDF. Please upload a valid PDF.');
-      return;
+    if (errors) {
+      console.log('incomingFiles[0]?.errors', errors);
     }
-
-    // Create FormData to handle file upload
-    const formData = new FormData();
-    formData.append('pdf', file);
-
-    try {
-      const response = await postData({
-        url: '/api/create-document-summary',
-        data: formData,
-        contentType: 'multipart/form-data'
-      });
-      console.log('Server Response:', response);
-      if (response) {
-        setPdfSummary(response);
-      }
-    } catch (error) {
-      console.error('Error uploading PDF:', error);
-      alert('Upload failed. Please try again later.');
-    }
+  };
+  const handleUploadFinish = () => {
+    console.log('finished uploading');
   };
 
   return (
     <>
-      <input
-        type="file"
-        ref={pdfInputRef}
-        className="w-1/2 p-3 rounded-md bg-zinc-800"
-        placeholder="Your PDF"
-        accept=".pdf"
-        onChange={handleFileChange}
-      />
-      {pdfSummary && <div>{pdfSummary.text}</div>}
+      <Dropzone
+        onChange={handleFilesChange}
+        maxFiles={1}
+        clickable={true}
+        accept="application/pdf"
+        value={files}
+        label="Drop PDF or click to upload your document"
+        uploadConfig={{
+          url: '/api/create-document-summary',
+          method: 'POST',
+          cleanOnUpload: true,
+          autoUpload: true
+        }}
+        onUploadFinish={handleUploadFinish}
+      >
+        {files.map((file, index) => (
+          <FileMosaic key={file.id} {...file} preview />
+        ))}
+      </Dropzone>
+
+      {pdfSummary && <div>{pdfSummary.payload.chainResponse?.text}</div>}
     </>
   );
 };

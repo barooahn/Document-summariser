@@ -1,7 +1,5 @@
 // import 'dotenv/config';
 import fs from 'fs';
-// import { VectorDBQAChain, APIChain } from 'langchain/chains';
-// import { FaissStore } from "langchain/vectorstores/faiss";
 import { RetrievalQAChain } from 'langchain/chains';
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
 import { CacheBackedEmbeddings } from 'langchain/embeddings/cache_backed';
@@ -9,10 +7,13 @@ import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { OpenAI } from 'langchain/llms/openai';
 import { InMemoryStore } from 'langchain/storage/in_memory';
 import { HNSWLib } from 'langchain/vectorstores/hnswlib';
+// import { VectorDBQAChain, APIChain } from 'langchain/chains';
+// import { FaissStore } from "langchain/vectorstores/faiss";
+import { NextResponse } from 'next/server';
 import os from 'os';
 import path from 'path';
 
-export async function POST(req: Request) {
+export async function POST(req: Request, res: any) {
   if (req.method === 'POST') {
     // Assuming you are posting the PDF as a blob or file in the request body
     const pdfData = await req.arrayBuffer();
@@ -56,21 +57,38 @@ export async function POST(req: Request) {
 
     const chain = RetrievalQAChain.fromLLM(llm, vectorStoreRetriever);
     console.log('querying chain');
-    const res = await chain.call({
+    const chainResponse = await chain.call({
       query: 'Summarise the document in 100 words or less?'
     });
-    console.log({ res });
+    console.log({ chainResponse });
+
+    // delete the temp file
+    // return new Response(JSON.stringify(chainResponse), {
+    //   statusText: 'File was uploaded successfully',
+    //   status: 200
+    // });
+    const responsePayload = {
+      success: true,
+      message: 'File was uploaded successfully',
+      payload: {
+        chainResponse: chainResponse
+      }
+    };
 
     // delete the temp file
     fs.unlinkSync(tempFileName);
-    return new Response(JSON.stringify(res), {
-      status: 200
-    });
+
+    // Use NextResponse.json to return the JSON payload
+    return NextResponse.json(responsePayload);
   } else {
-    return new Response('File not found', {
-      headers: { Allow: 'POST' },
-      status: 405
-    });
+    const errorPayload = {
+      success: false,
+      message: 'File not found',
+      payload: {}
+    };
+
+    // Use NextResponse.json to return the error payload with a 405 status code
+    return NextResponse.json(errorPayload, { status: 405 });
   }
 }
 
