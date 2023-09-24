@@ -1,72 +1,40 @@
-// import 'dotenv/config';
+import { vectorStoreRetriever } from '../../api-helpers/vector-store';
+import { llm } from '../../config';
 import fs from 'fs';
 import { RetrievalQAChain } from 'langchain/chains';
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
-import { CacheBackedEmbeddings } from 'langchain/embeddings/cache_backed';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
-import { OpenAI } from 'langchain/llms/openai';
-import { InMemoryStore } from 'langchain/storage/in_memory';
-import { HNSWLib } from 'langchain/vectorstores/hnswlib';
-// import { VectorDBQAChain, APIChain } from 'langchain/chains';
-// import { FaissStore } from "langchain/vectorstores/faiss";
 import { NextResponse } from 'next/server';
 import os from 'os';
 import path from 'path';
 
 export async function POST(req: Request, res: any) {
   if (req.method === 'POST') {
-    // Assuming you are posting the PDF as a blob or file in the request body
+    // read file and create temp file
     const pdfData = await req.arrayBuffer();
     const pdfBuffer = Buffer.from(pdfData);
-    // Save buffer to a temporary file
     const tempFileName = path.join(os.tmpdir(), 'temp_uploaded_pdf.pdf');
     fs.writeFileSync(tempFileName, pdfBuffer);
 
-    console.log('file created called', tempFileName);
     const pdfLoader = new PDFLoader(tempFileName);
     const docs = await pdfLoader.load();
 
-    const llm = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-      temperature: 0
-    } as any);
+    // May need to split documents later
+    // const splitter = new CharacterTextSplitter({
+    //   separator: ' ',
+    //   chunkSize: 1000,
+    //   chunkOverlap: 3
+    // });
+    // const docs = await splitter.createDocuments(document);
 
-    const underlyingEmbeddings = new OpenAIEmbeddings();
-    const inMemoryStore = new InMemoryStore();
+    const vsr = vectorStoreRetriever(docs);
 
-    const cacheBackedEmbeddings = CacheBackedEmbeddings.fromBytesStore(
-      underlyingEmbeddings,
-      inMemoryStore,
-      {
-        namespace: underlyingEmbeddings.modelName
-      }
-    );
-
-    // No keys logged yet since the cache is empty
-    for await (const key of inMemoryStore.yieldKeys()) {
-      console.log(key);
-    }
-
-    let time = Date.now();
-    const vectorStore = await HNSWLib.fromDocuments(
-      docs,
-      cacheBackedEmbeddings
-    );
-
-    const vectorStoreRetriever = vectorStore.asRetriever();
-
-    const chain = RetrievalQAChain.fromLLM(llm, vectorStoreRetriever);
+    const chain = RetrievalQAChain.fromLLM(llm, await vsr);
     console.log('querying chain');
     const chainResponse = await chain.call({
       query: 'Summarise the document in 100 words or less?'
     });
     console.log({ chainResponse });
 
-    // delete the temp file
-    // return new Response(JSON.stringify(chainResponse), {
-    //   statusText: 'File was uploaded successfully',
-    //   status: 200
-    // });
     const responsePayload = {
       success: true,
       message: 'File was uploaded successfully',
@@ -75,10 +43,8 @@ export async function POST(req: Request, res: any) {
       }
     };
 
-    // delete the temp file
     fs.unlinkSync(tempFileName);
 
-    // Use NextResponse.json to return the JSON payload
     return NextResponse.json(responsePayload);
   } else {
     const errorPayload = {
@@ -87,7 +53,6 @@ export async function POST(req: Request, res: any) {
       payload: {}
     };
 
-    // Use NextResponse.json to return the error payload with a 405 status code
     return NextResponse.json(errorPayload, { status: 405 });
   }
 }

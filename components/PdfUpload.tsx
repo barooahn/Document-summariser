@@ -1,5 +1,6 @@
 'use client';
 
+import Button from './ui/Button';
 import { Dropzone, ExtFile, FileMosaic } from '@dropzone-ui/react';
 import React, { useState } from 'react';
 
@@ -12,6 +13,22 @@ type ServerResponse = {
     };
   };
 };
+async function handleButtonClick() {
+  try {
+    const response = await fetch('/api/create-start-conversation', {
+      method: 'POST'
+    });
+    if (!response.ok) {
+      // If the response is not 2xx, we throw an error.
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+    const result = await response.json();
+    console.log(result); // log the result for debugging
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
 const PDFUploader: React.FC = () => {
   const [pdfSummary, setPdfSummary] = useState<ServerResponse | null>(null);
   const [files, setFiles] = useState<ExtFile[]>([]);
@@ -21,15 +38,17 @@ const PDFUploader: React.FC = () => {
 
     setFiles(incomingFiles);
     if (uploadStatus === 'success' && xhr?.response) {
-      const parsedResponse: ServerResponse = JSON.parse(xhr?.response);
-      setPdfSummary(parsedResponse);
+      try {
+        const parsedResponse: ServerResponse = JSON.parse(xhr?.response);
+        setPdfSummary(parsedResponse);
+      } catch (error) {
+        console.error('Failed to parse server response:', error);
+        console.error('Response:', xhr?.response);
+      }
     }
     if (errors) {
       console.log('incomingFiles[0]?.errors', errors);
     }
-  };
-  const handleUploadFinish = () => {
-    console.log('finished uploading');
   };
 
   return (
@@ -47,7 +66,6 @@ const PDFUploader: React.FC = () => {
           cleanOnUpload: true,
           autoUpload: true
         }}
-        onUploadFinish={handleUploadFinish}
       >
         {files.map((file, index) => (
           <FileMosaic key={file.id} {...file} preview />
@@ -55,6 +73,13 @@ const PDFUploader: React.FC = () => {
       </Dropzone>
 
       {pdfSummary && <div>{pdfSummary.payload.chainResponse?.text}</div>}
+
+      {pdfSummary && (
+        <>
+          <div>Ask questions about your document</div>
+          <Button onClick={handleButtonClick}>Chat now</Button>
+        </>
+      )}
     </>
   );
 };
