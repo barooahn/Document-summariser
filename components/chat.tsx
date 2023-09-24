@@ -10,8 +10,7 @@ export default function Home() {
   const [history, setHistory] = useState<Message[]>([
     {
       role: 'assistant',
-      content:
-        'Hello! Ask me legal questions about immigration to the Netherlands.'
+      content: 'Hello! Ask me questions about your document.'
     }
   ]);
   const lastMessageRef = useRef<HTMLDivElement | null>(null);
@@ -25,7 +24,7 @@ export default function Home() {
     ]);
     setMessage('');
     setLoading(true);
-    fetch('/api/chat', {
+    fetch('/api/create-start-conversation', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query: message, history: history })
