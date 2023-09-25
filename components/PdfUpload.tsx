@@ -1,6 +1,6 @@
 'use client';
 
-import Chat from './ChatUI';
+import ChatUI from './ChatUI';
 import Button from './ui/Button';
 import { Dropzone, ExtFile, FileMosaic } from '@dropzone-ui/react';
 import React, { useState } from 'react';
@@ -73,10 +73,10 @@ const PDFUploader: React.FC = () => {
         ))}
       </Dropzone>
 
+      <ChatUI />
       {pdfSummary && (
         <>
           <div>{pdfSummary.payload.chainResponse?.text}</div>
-          <Chat />
         </>
       )}
     </>
