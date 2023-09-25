@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  staticPageGenerationTimeout: 120,
+  staticPageGenerationTimeout: 1020,
   experimental: {
     appDir: true,
     serverActions: true
