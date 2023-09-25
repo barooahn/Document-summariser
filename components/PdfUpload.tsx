@@ -1,6 +1,6 @@
 'use client';
 
-import Chat from './Chat';
+import Chat from './ChatUI';
 import Button from './ui/Button';
 import { Dropzone, ExtFile, FileMosaic } from '@dropzone-ui/react';
 import React, { useState } from 'react';
