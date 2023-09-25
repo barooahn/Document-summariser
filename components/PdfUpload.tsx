@@ -1,7 +1,6 @@
 'use client';
 
 import ChatUI from './ChatUI';
-import Button from './ui/Button';
 import { Dropzone, ExtFile, FileMosaic } from '@dropzone-ui/react';
 import React, { useState } from 'react';
 
@@ -14,21 +13,6 @@ type ServerResponse = {
     };
   };
 };
-async function handleButtonClick() {
-  try {
-    const response = await fetch('/api/create-start-conversation', {
-      method: 'POST'
-    });
-    if (!response.ok) {
-      // If the response is not 2xx, we throw an error.
-      throw new Error('Network response was not ok ' + response.statusText);
-    }
-    const result = await response.json();
-    console.log(result); // log the result for debugging
-  } catch (error) {
-    console.error('Error:', error);
-  }
-}
 
 const PDFUploader: React.FC = () => {
   const [pdfSummary, setPdfSummary] = useState<ServerResponse | null>(null);
@@ -73,10 +57,10 @@ const PDFUploader: React.FC = () => {
         ))}
       </Dropzone>
 
-      <ChatUI />
       {pdfSummary && (
         <>
           <div>{pdfSummary.payload.chainResponse?.text}</div>
+          <ChatUI />
         </>
       )}
     </>

@@ -1,13 +1,15 @@
+import { pinecone } from '@/utils/pinecone-client';
 import { Document } from 'langchain/dist/document';
 import { VectorStoreRetriever } from 'langchain/dist/vectorstores/base';
 import { CacheBackedEmbeddings } from 'langchain/embeddings/cache_backed';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { InMemoryStore } from 'langchain/storage/in_memory';
-import { HNSWLib } from 'langchain/vectorstores/hnswlib';
+import { PineconeStore } from 'langchain/vectorstores/pinecone';
 
 export async function vectorStoreRetriever(
   docs: Document<Record<string, any>>[] | null = null
-): Promise<VectorStoreRetriever<HNSWLib>> {
+): Promise<VectorStoreRetriever<PineconeStore>> {
+  const pineconeIndex = pinecone.Index(process.env.PINECONE_INDEX ?? '');
   if (docs === null) {
     throw new Error('No existing vector store and no documents provided.');
   }
@@ -23,7 +25,14 @@ export async function vectorStoreRetriever(
     }
   );
 
-  const vectorStore = await HNSWLib.fromDocuments(docs, cacheBackedEmbeddings);
+  const vectorStore = await PineconeStore.fromDocuments(
+    docs,
+    cacheBackedEmbeddings,
+    {
+      pineconeIndex: pineconeIndex,
+      textKey: 'text'
+    }
+  );
 
   return vectorStore.asRetriever();
 }
