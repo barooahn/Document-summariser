@@ -56,31 +56,3 @@ export async function POST(req: Request, res: any) {
     return NextResponse.json(errorPayload, { status: 405 });
   }
 }
-
-// const model = new OpenAI({ temperature: 0 });
-// const tools = [
-//   // new SerpAPI(process.env.SERPAPI_API_KEY, {
-//   // 	location: "London, United Kingdom",
-//   // 	hl: "en",
-//   // 	gl: "uk",
-//   // }),
-//   // new WikipediaQueryRun(),
-//   // qaTool,
-//   // qaVotingTool,
-//   qaAPITool
-// ];
-
-// const memory = new BufferMemory();
-
-// const executor = await initializeAgentExecutorWithOptions(tools, model, {
-//   agentType: 'zero-shot-react-description',
-//   verbose: true
-// });
-
-// const input = 'Which divisions did Diane Abbott vote in and how did she vote?';
-
-// const result = await executor.call({
-//   input
-// });
-
-// console.log('result', result);
