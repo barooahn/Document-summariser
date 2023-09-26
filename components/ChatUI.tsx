@@ -24,19 +24,19 @@ export default function ChatUI() {
     ]);
     setMessage('');
     setLoading(true);
-    // fetch('/api/create-start-conversation', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ query: message, history: history })
-    // })
-    //   .then(async (res) => {
-    //     const r = await res.json();
-    //     setHistory((oldHistory) => [...oldHistory, r]);
-    //     setLoading(false);
-    //   })
-    //   .catch((err) => {
-    //     alert(err);
-    //   });
+    fetch('/api/create-start-conversation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: message, history: history })
+    })
+      .then(async (res) => {
+        const r = await res.json();
+        setHistory((oldHistory) => [...oldHistory, r]);
+        setLoading(false);
+      })
+      .catch((err) => {
+        alert(err);
+      });
   };
 
   const formatPageName = (url: string) => {
