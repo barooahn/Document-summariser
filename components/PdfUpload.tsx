@@ -31,6 +31,9 @@ const PDFUploader: React.FC = () => {
         console.error('Response:', xhr?.response);
       }
     }
+    if (uploadStatus === 'error') {
+      console.error('Upload Error:', xhr?.statusText);
+    }
     if (errors) {
       console.log('incomingFiles[0]?.errors', errors);
     }

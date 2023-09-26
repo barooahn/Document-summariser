@@ -13,8 +13,6 @@ export async function POST(request: Request) {
       chat_history: history.map((h) => h.content).join('\n')
     });
 
-    console.log(res.sourceDocuments);
-
     const links: string[] = Array.from(
       new Set(
         res.sourceDocuments.map(
