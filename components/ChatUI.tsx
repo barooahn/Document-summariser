@@ -60,13 +60,13 @@ export default function ChatUI() {
   }, [history]);
 
   return (
-    <main className="h-screen bg-white p-6 flex flex-col">
+    <main className="h-screen bg-black p-6 flex flex-col">
       <div className="flex flex-col gap-8 w-full items-center flex-grow max-h-full">
-        <h1 className=" text-4xl text-transparent font-extralight bg-clip-text bg-gradient-to-r from-violet-800 to-fuchsia-500">
+        <h1 className=" text-4xl text-transparent font-extralight bg-clip-text bg-gradient-to-r from-white-800 to-fuchsia-500">
           IND chat
         </h1>
         <form
-          className="rounded-2xl border-purple-700 border-opacity-5  border lg:w-3/4 flex-grow flex flex-col bg-[url('/images/bg.png')] bg-cover max-h-full overflow-clip"
+          className="rounded-2xl border-white-700 border-opacity-5  border lg:w-3/4 flex-grow flex flex-col max-h-full overflow-clip"
           onSubmit={(e) => {
             e.preventDefault();
             handleClick();
@@ -83,11 +83,7 @@ export default function ChatUI() {
                       key={idx}
                       className="flex gap-2"
                     >
-                      <img
-                        src="images/assistant-avatar.png"
-                        className="h-12 w-12 rounded-full"
-                      />
-                      <div className="w-auto max-w-xl break-words bg-white rounded-b-xl rounded-tr-xl text-black p-6 shadow-[0_10px_40px_0px_rgba(0,0,0,0.15)]">
+                      <div className="w-auto max-w-xl break-words bg-black rounded-b-xl rounded-tr-xl text-white p-6 shadow-[0_10px_40px_0px_rgba(0,0,0,0.15)]">
                         <p className="text-sm font-medium text-violet-500 mb-2">
                           AI assistant
                         </p>
@@ -103,7 +99,7 @@ export default function ChatUI() {
                                 <a
                                   href={link}
                                   key={link}
-                                  className="block w-fit px-2 py-1 text-sm  text-violet-700 bg-violet-100 rounded"
+                                  className="block w-fit px-2 py-1 text-sm  text-violet-700 bg-black-100 rounded"
                                 >
                                   {formatPageName(link)}
                                 </a>
@@ -117,7 +113,7 @@ export default function ChatUI() {
                 case 'user':
                   return (
                     <div
-                      className="w-auto max-w-xl break-words bg-white rounded-b-xl rounded-tl-xl text-black p-6 self-end shadow-[0_10px_40px_0px_rgba(0,0,0,0.15)]"
+                      className="w-auto max-w-xl break-words bg-black rounded-b-xl rounded-tl-xl text-white p-6 self-end shadow-[0_10px_40px_0px_rgba(0,0,0,0.15)]"
                       key={idx}
                       ref={isLastMessage ? lastMessageRef : null}
                     >
@@ -135,7 +131,7 @@ export default function ChatUI() {
                   src="images/assistant-avatar.png"
                   className="h-12 w-12 rounded-full"
                 />
-                <div className="w-auto max-w-xl break-words bg-white rounded-b-xl rounded-tr-xl text-black p-6 shadow-[0_10px_40px_0px_rgba(0,0,0,0.15)]">
+                <div className="w-auto max-w-xl break-words bg-black rounded-b-xl rounded-tr-xl text-white p-6 shadow-[0_10px_40px_0px_rgba(0,0,0,0.15)]">
                   <p className="text-sm font-medium text-violet-500 mb-4">
                     AI assistant
                   </p>
@@ -147,13 +143,13 @@ export default function ChatUI() {
 
           {/* input area */}
           <div className="flex sticky bottom-0 w-full px-6 pb-6 h-24">
-            <div className="w-full relative">
+            <div className="w-full relative ">
               <textarea
                 aria-label="chat input"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Type a message"
-                className="text-black w-full h-full resize-none rounded-full border border-slate-900/10 bg-white pl-6 pr-24 py-[25px] text-base placeholder:text-slate-400 focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-500/10 shadow-[0_10px_40px_0px_rgba(0,0,0,0.15)]"
+                className="text-white w-full h-full resize-none rounded-full border border-white-900/10 bg-black pl-6 pr-24 py-[25px] text-base placeholder:text-slate-400 focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-500/10 shadow-[0_10px_40px_0px_rgba(0,0,0,0.15)] "
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();

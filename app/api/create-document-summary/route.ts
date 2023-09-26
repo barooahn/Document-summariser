@@ -3,6 +3,7 @@ import { llm } from '../../config';
 import fs from 'fs/promises';
 import { RetrievalQAChain } from 'langchain/chains';
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
+import { CharacterTextSplitter } from 'langchain/text_splitter';
 import { NextResponse } from 'next/server';
 import os from 'os';
 import path from 'path';
@@ -28,15 +29,15 @@ export async function POST(req: Request, res: any) {
     await fs.writeFile(tempFileName, pdfBuffer);
 
     const pdfLoader = new PDFLoader(tempFileName);
-    const docs = await pdfLoader.load();
+    const docsUploaded = await pdfLoader.load();
 
     // May need to split documents later
-    // const splitter = new CharacterTextSplitter({
-    //   separator: ' ',
-    //   chunkSize: 1000,
-    //   chunkOverlap: 3
-    // });
-    // const docs = await splitter.createDocuments(document);
+    const splitter = new CharacterTextSplitter({
+      separator: ' ',
+      chunkSize: 1000,
+      chunkOverlap: 200
+    });
+    const docs = await splitter.splitDocuments(docsUploaded);
 
     const vsr = vectorStoreRetriever(docs);
 
