@@ -4,6 +4,7 @@ import LoadingDots from '@/components/LoadingDots';
 import { Message } from '@/types/message';
 import { useState, useRef, useEffect } from 'react';
 import { Send } from 'react-feather';
+import '@/styles/chat-styles.css';
 
 export default function ChatUI() {
   const [message, setMessage] = useState<string>('');
@@ -15,6 +16,7 @@ export default function ChatUI() {
   ]);
   const lastMessageRef = useRef<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleClick = () => {
     if (message == '') return;
@@ -60,19 +62,19 @@ export default function ChatUI() {
   }, [history]);
 
   return (
-    <main className="h-screen bg-black p-6 flex flex-col">
+    <main className="h-screen bg-black flex flex-col w-full">
       <div className="flex flex-col gap-8 w-full items-center flex-grow max-h-full">
-        <h1 className=" text-4xl text-transparent font-extralight bg-clip-text bg-gradient-to-r from-white-800 to-fuchsia-500">
-          IND chat
+        <h1 className="sm:text-2xl lg:text-4xl text-white font-extralight">
+          Ask me about your document
         </h1>
         <form
-          className="rounded-2xl border-white-700 border-opacity-5  border lg:w-3/4 flex-grow flex flex-col max-h-full overflow-clip"
+          className="rounded-2xl border-white-700 border-opacity-5 border w-full flex-grow flex flex-col max-h-full overflow-clip"
           onSubmit={(e) => {
             e.preventDefault();
             handleClick();
           }}
         >
-          <div className="overflow-y-scroll flex flex-col gap-5 p-10 h-full">
+          <div className="overflow-y-auto flex flex-col gap-2 p-4 h-full">
             {history.map((message: Message, idx) => {
               const isLastMessage = idx === history.length - 1;
               switch (message.role) {
@@ -84,7 +86,7 @@ export default function ChatUI() {
                       className="flex gap-2"
                     >
                       <div className="w-auto max-w-xl break-words bg-black rounded-b-xl rounded-tr-xl text-white p-6 shadow-[0_10px_40px_0px_rgba(0,0,0,0.15)]">
-                        <p className="text-sm font-medium text-violet-500 mb-2">
+                        <p className="text-sm font-medium text-pink-500 mb-2">
                           AI assistant
                         </p>
                         {message.content}
@@ -99,7 +101,7 @@ export default function ChatUI() {
                                 <a
                                   href={link}
                                   key={link}
-                                  className="block w-fit px-2 py-1 text-sm  text-violet-700 bg-black-100 rounded"
+                                  className="block w-fit px-2 py-1 text-sm  text-pink-700 bg-black-100 rounded"
                                 >
                                   {formatPageName(link)}
                                 </a>
@@ -113,11 +115,11 @@ export default function ChatUI() {
                 case 'user':
                   return (
                     <div
-                      className="w-auto max-w-xl break-words bg-black rounded-b-xl rounded-tl-xl text-white p-6 self-end shadow-[0_10px_40px_0px_rgba(0,0,0,0.15)]"
+                      className="w-auto max-w-xl break-words bg-black rounded-b-xl rounded-tl-xl text-white p-6 self-end "
                       key={idx}
                       ref={isLastMessage ? lastMessageRef : null}
                     >
-                      <p className="text-sm font-medium text-violet-500 mb-2">
+                      <p className="text-sm font-medium text-pink-500 mb-2">
                         You
                       </p>
                       {message.content}
@@ -127,12 +129,8 @@ export default function ChatUI() {
             })}
             {loading && (
               <div ref={lastMessageRef} className="flex gap-2">
-                <img
-                  src="images/assistant-avatar.png"
-                  className="h-12 w-12 rounded-full"
-                />
-                <div className="w-auto max-w-xl break-words bg-black rounded-b-xl rounded-tr-xl text-white p-6 shadow-[0_10px_40px_0px_rgba(0,0,0,0.15)]">
-                  <p className="text-sm font-medium text-violet-500 mb-4">
+                <div className="w-auto max-w-xl break-words bg-black rounded-b-xl rounded-tr-xl text-white p-6 ">
+                  <p className="text-sm font-medium text-pink-500 mb-4">
                     AI assistant
                   </p>
                   <LoadingDots />
@@ -142,14 +140,18 @@ export default function ChatUI() {
           </div>
 
           {/* input area */}
-          <div className="flex sticky bottom-0 w-full px-6 pb-6 h-24">
-            <div className="w-full relative ">
+          <div className="flex sticky bottom-0 w-full sm:px-4 lg:px-4 lg:pb-6 relative">
+            <div className="flex sticky bottom-0 w-full lg:px-4 lg:pb-6 relative bg-black rounded-b-xl">
               <textarea
                 aria-label="chat input"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type a message"
-                className="text-white w-full h-full resize-none rounded-full border border-white-900/10 bg-black pl-6 pr-24 py-[25px] text-base placeholder:text-slate-400 focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-500/10 shadow-[0_10px_40px_0px_rgba(0,0,0,0.15)] "
+                placeholder={isFocused ? '' : 'Ask anything'}
+                className="flex-grow text-white resize-none rounded-l-xl border border-white-900/10 
+    bg-black p-6 placeholder:text-pink-400 placeholder:leading-10 focus:border-pink-500 focus:outline-none 
+    focus:ring-4 focus:ring-pink-500/10"
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -162,7 +164,9 @@ export default function ChatUI() {
                   e.preventDefault();
                   handleClick();
                 }}
-                className="flex w-14 h-14 items-center justify-center rounded-full px-3 text-sm  bg-violet-600 font-semibold text-white hover:bg-violet-700 active:bg-violet-800 absolute right-2 bottom-2 disabled:bg-violet-100 disabled:text-violet-400"
+                className="sendButton flex items-center justify-center rounded-r-xl border border-white bg-black px-3 text-sm 
+     font-semibold text-white hover:bg-white hover:text-black active:bg-gray-300 
+     disabled:bg-gray-100 disabled:text-gray-400 border-l border-white transition-colors duration-200 cursor-pointer"
                 type="submit"
                 aria-label="Send"
                 disabled={!message || loading}

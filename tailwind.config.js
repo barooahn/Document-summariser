@@ -15,5 +15,11 @@ module.exports = {
       }
     }
   },
+  variants: {
+    extend: {
+      opacity: ['disabled'],
+      placeholderOpacity: ['focus']
+    }
+  },
   plugins: []
 };

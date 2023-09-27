@@ -1,0 +1,16 @@
+.sendButton {
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.sendButton:hover {
+  background-color: white;
+  color: black;
+}
+
+.sendButton svg {
+  transition: fill 0.3s ease-in-out;
+}
+
+.sendButton:hover svg {
+  fill: black;
+}

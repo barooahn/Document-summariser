@@ -41,29 +41,34 @@ const PDFUploader: React.FC = () => {
 
   return (
     <>
-      <Dropzone
-        onChange={handleFilesChange}
-        maxFiles={1}
-        clickable={true}
-        accept="application/pdf"
-        value={files}
-        label="Drop PDF or click to upload your document"
-        uploadConfig={{
-          url: '/api/create-document-summary',
-          method: 'POST',
-          cleanOnUpload: true,
-          autoUpload: true
-        }}
-      >
-        {files.map((file, index) => (
-          <FileMosaic key={file.id} {...file} preview />
-        ))}
-      </Dropzone>
-
+      <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-8">
+        <Dropzone
+          onChange={handleFilesChange}
+          maxFiles={1}
+          clickable={true}
+          accept="application/pdf"
+          value={files}
+          label="Drop PDF or click to upload your document"
+          uploadConfig={{
+            url: '/api/create-document-summary',
+            method: 'POST',
+            cleanOnUpload: true,
+            autoUpload: true
+          }}
+        >
+          {files.map((file, index) => (
+            <FileMosaic key={file.id} {...file} preview />
+          ))}
+        </Dropzone>
+      </section>
       {pdfSummary && (
         <>
-          <div>{pdfSummary.payload.chainResponse?.text}</div>
-          <ChatUI />
+          <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-4">
+            <p>{pdfSummary.payload.chainResponse?.text}</p>
+          </section>
+          <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-4">
+            <ChatUI />
+          </section>
         </>
       )}
     </>
