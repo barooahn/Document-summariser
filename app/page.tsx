@@ -14,14 +14,6 @@ export default async function PricingPage() {
   ]);
 
   return (
-    <>
-      <Pricing
-        session={session}
-        user={session?.user}
-        products={products}
-        subscription={subscription}
-      />
-      <PdfUpload />
-    </>
+    <PdfUpload />
   );
 }

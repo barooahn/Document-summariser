@@ -50,3 +50,15 @@ a {
 .height-screen-helper {
   height: calc(100vh - 80px);
 }
+
+main {
+  padding: 20px;
+}
+
+.summaryText {
+  margin-top: 12px;
+}
+
+#skip > main > div > form > div.flex.sticky.bottom-0.w-full.px-6.pb-6.h-24 > div > textarea { 
+ height: 4.8em;
+}

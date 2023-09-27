@@ -62,7 +62,7 @@ const PDFUploader: React.FC = () => {
 
       {pdfSummary && (
         <>
-          <div>{pdfSummary.payload.chainResponse?.text}</div>
+          <div className='summaryText'>{pdfSummary.payload.chainResponse?.text}</div>
           <ChatUI />
         </>
       )}
