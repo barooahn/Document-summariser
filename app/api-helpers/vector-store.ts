@@ -47,5 +47,4 @@ export async function vectorStoreRetriever(
       return vectorStore.asRetriever();
     }
   }
-  throw new Error('No existing vector store and no documents provided.');
 }
