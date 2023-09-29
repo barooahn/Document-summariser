@@ -2,7 +2,7 @@
 
 # dependencies
 /node_modules
-/vector-stores/*
+/vector-stores
 /.pnp
 .pnp.js
 
