@@ -7,7 +7,7 @@ import { HNSWLib } from 'langchain/vectorstores/hnswlib';
 
 export async function vectorStoreRetriever(
   docs?: Document<Record<string, any>>[]
-): Promise<VectorStoreRetriever<HNSWLib>> {
+): Promise<VectorStoreRetriever<HNSWLib> | null> {
   const directory = process.env.VECTORSTORES;
   if (!docs && directory) {
     console.log(
@@ -47,4 +47,5 @@ export async function vectorStoreRetriever(
       return vectorStore.asRetriever();
     }
   }
+  return null;
 }
