@@ -7,45 +7,32 @@ import { HNSWLib } from 'langchain/vectorstores/hnswlib';
 
 export async function vectorStoreRetriever(
   docs?: Document<Record<string, any>>[]
-): Promise<VectorStoreRetriever<HNSWLib> | null> {
+): Promise<VectorStoreRetriever<HNSWLib>> {
   const directory = process.env.VECTORSTORES;
+  const underlyingEmbeddings = new OpenAIEmbeddings();
+
   if (!docs && directory) {
-    console.log(
-      'loading                                                                                                                                                                                                                                                                                                                                                                                                                                                vector store... '
-    );
-    const loadedVectorStore = await HNSWLib.load(
-      directory,
-      new OpenAIEmbeddings()
-    );
-    if (loadedVectorStore) {
-      return loadedVectorStore.asRetriever();
-    }
-    throw new Error('Could not load vector store and no documents provided.');
+    console.log('loading vector store...');
+    return (await HNSWLib.load(directory, underlyingEmbeddings)).asRetriever();
   }
 
-  const underlyingEmbeddings = new OpenAIEmbeddings();
-  const inMemoryStore = new InMemoryStore();
-
-  const cacheBackedEmbeddings = CacheBackedEmbeddings.fromBytesStore(
-    underlyingEmbeddings,
-    inMemoryStore,
-    {
-      namespace: underlyingEmbeddings.modelName
-    }
-  );
-
   if (docs && directory) {
-    console.log('creating vector store... ');
+    console.log('creating vector store...');
+    const inMemoryStore = new InMemoryStore();
+    const cacheBackedEmbeddings = CacheBackedEmbeddings.fromBytesStore(
+      underlyingEmbeddings,
+      inMemoryStore,
+      { namespace: underlyingEmbeddings.modelName }
+    );
     const vectorStore = await HNSWLib.fromDocuments(
       docs,
       cacheBackedEmbeddings
     );
-
     await vectorStore.save(directory);
-
-    if (vectorStore) {
-      return vectorStore.asRetriever();
-    }
+    return vectorStore.asRetriever();
   }
-  return null;
+
+  throw new Error(
+    'Either documents or VECTORSTORES directory must be provided.'
+  );
 }
