@@ -20,6 +20,7 @@
     "@supabase/supabase-js": "^2.23.0",
     "classnames": "^2.3.2",
     "dotenv": "^16.3.1",
+    "hnswlib-node": "^2.0.0",
     "langchain": "^0.0.153",
     "next": "13.4.3",
     "pdf-parse": "^1.1.1",

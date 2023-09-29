@@ -44,7 +44,7 @@ export async function POST(req: Request, res: any) {
     const chain = RetrievalQAChain.fromLLM(llm, await vsr);
     console.log('querying chain');
     const chainResponse = await chain.call({
-      query: 'Summarise the document in 100 words or less?'
+      query: 'Summarize the document in 100 words or less?'
     });
     console.log({ chainResponse });
 

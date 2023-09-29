@@ -1,28 +1,15 @@
-import { pinecone } from '@/utils/pinecone-client';
+import { vectorStoreRetriever } from '@/app/api-helpers/vector-store';
+import { llm } from '@/app/config';
 import { ConversationalRetrievalQAChain } from 'langchain/chains';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
-import { OpenAI } from 'langchain/llms/openai';
-import { PineconeStore } from 'langchain/vectorstores/pinecone';
 
 async function initChain() {
-  const model = new OpenAI({});
+  const vsr = await vectorStoreRetriever();
 
-  const pineconeIndex = pinecone.Index(process.env.PINECONE_INDEX ?? '');
+  console.log('vsr', vsr);
 
-  /* create vectorstore*/
-  const vectorStore = await PineconeStore.fromExistingIndex(
-    new OpenAIEmbeddings({}),
-    {
-      pineconeIndex: pineconeIndex,
-      textKey: 'text'
-    }
-  );
-
-  return ConversationalRetrievalQAChain.fromLLM(
-    model,
-    vectorStore.asRetriever(),
-    { returnSourceDocuments: true }
-  );
+  return ConversationalRetrievalQAChain.fromLLM(llm, vsr, {
+    returnSourceDocuments: true
+  });
 }
 
 export const chain = await initChain();

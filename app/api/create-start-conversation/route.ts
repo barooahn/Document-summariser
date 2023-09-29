@@ -13,18 +13,9 @@ export async function POST(request: Request) {
       chat_history: history.map((h) => h.content).join('\n')
     });
 
-    const links: string[] = Array.from(
-      new Set(
-        res.sourceDocuments.map(
-          (document: { metadata: { source: string } }) =>
-            document.metadata.source
-        )
-      )
-    );
     return NextResponse.json({
       role: 'assistant',
-      content: res.text,
-      links: links
+      content: res.text
     });
   } catch (error) {
     console.error(error);
