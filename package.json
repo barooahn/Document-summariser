@@ -2,6 +2,11 @@
   "name": "nextjs-subscription-payments",
   "version": "0.0.0",
   "license": "MIT",
+  "pkg": {
+    "assets": [
+      "vector-stores/**"
+    ]
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
