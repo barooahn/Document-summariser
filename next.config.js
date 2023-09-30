@@ -2,10 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   staticPageGenerationTimeout: 1000,
-  output: 'standalone',
   experimental: {
     appDir: true,
-    serverActions: true
+    serverActions: true,
+    nftTracing: true
   },
   webpack(config) {
     config.experiments = { ...config.experiments, topLevelAwait: true };
