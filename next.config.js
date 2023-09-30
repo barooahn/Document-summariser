@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   staticPageGenerationTimeout: 1000,
+  output: 'standalone',
   experimental: {
     appDir: true,
     serverActions: true
