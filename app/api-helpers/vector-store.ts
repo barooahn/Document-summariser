@@ -4,11 +4,15 @@ import { CacheBackedEmbeddings } from 'langchain/embeddings/cache_backed';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { InMemoryStore } from 'langchain/storage/in_memory';
 import { HNSWLib } from 'langchain/vectorstores/hnswlib';
+import path from 'path';
 
 export async function vectorStoreRetriever(
   docs?: Document<Record<string, any>>[]
 ): Promise<VectorStoreRetriever<HNSWLib>> {
-  const directory = process.env.VECTORSTORES;
+  if (!process.env.VECTORSTORES) {
+    throw new Error('VECTORSTORES environment variable is not set.');
+  }
+  const directory = path.join(process.cwd(), process.env.VECTORSTORES);
   const underlyingEmbeddings = new OpenAIEmbeddings();
 
   if (!docs && directory) {
