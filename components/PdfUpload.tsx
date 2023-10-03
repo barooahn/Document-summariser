@@ -11,12 +11,15 @@ type ServerResponse = {
     chainResponse: {
       text: string;
     };
+    collectionName: string;
   };
 };
 
 const PDFUploader: React.FC = () => {
   const [pdfSummary, setPdfSummary] = useState<ServerResponse | null>(null);
   const [files, setFiles] = useState<ExtFile[]>([]);
+
+  const collectionName = pdfSummary?.payload?.collectionName || '';
 
   const handleFilesChange = (incomingFiles: ExtFile[]) => {
     const { uploadStatus, errors, xhr } = incomingFiles[0];
@@ -67,7 +70,7 @@ const PDFUploader: React.FC = () => {
             <p>{pdfSummary.payload.chainResponse?.text}</p>
           </section>
           <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-4">
-            <ChatUI />
+            <ChatUI collectionName={collectionName} />
           </section>
         </>
       )}

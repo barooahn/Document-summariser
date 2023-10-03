@@ -6,7 +6,11 @@ import { useState, useRef, useEffect } from 'react';
 import { Send } from 'react-feather';
 import '@/styles/chat-styles.css';
 
-export default function ChatUI() {
+type ChatUIProps = {
+  collectionName: string;
+};
+
+export default function ChatUI(props: ChatUIProps) {
   const [message, setMessage] = useState<string>('');
   const [history, setHistory] = useState<Message[]>([
     {
@@ -29,7 +33,11 @@ export default function ChatUI() {
     fetch('/api/create-start-conversation', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: message, history: history })
+      body: JSON.stringify({
+        query: message,
+        history: history,
+        collectionName: props.collectionName
+      })
     })
       .then(async (res) => {
         const r = await res.json();

@@ -3,7 +3,7 @@ import { llm } from '@/app/config';
 import { ConversationalRetrievalQAChain } from 'langchain/chains';
 
 async function initChain() {
-  const vsr = await vectorStoreRetriever();
+  const vsr = await vectorStoreRetriever('hellol');
 
   console.log('vsr', vsr);
 

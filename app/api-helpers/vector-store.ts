@@ -1,39 +1,31 @@
 import { Document } from 'langchain/dist/document';
 import { VectorStoreRetriever } from 'langchain/dist/vectorstores/base';
-import { CacheBackedEmbeddings } from 'langchain/embeddings/cache_backed';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
-import { InMemoryStore } from 'langchain/storage/in_memory';
-import { HNSWLib } from 'langchain/vectorstores/hnswlib';
-import path from 'path';
+import { Chroma } from 'langchain/vectorstores/chroma';
 
 export async function vectorStoreRetriever(
+  collectionName: string,
   docs?: Document<Record<string, any>>[]
-): Promise<VectorStoreRetriever<HNSWLib>> {
-  if (!process.env.VECTORSTORES) {
-    throw new Error('VECTORSTORES environment variable is not set.');
-  }
-  const directory = path.join(process.cwd(), process.env.VECTORSTORES);
-  const underlyingEmbeddings = new OpenAIEmbeddings();
+): Promise<VectorStoreRetriever<Chroma>> {
 
-  if (!docs && directory) {
+  const embeddings = new OpenAIEmbeddings();
+
+  if (!docs) {
     console.log('loading vector store...');
-    return (await HNSWLib.load(directory, underlyingEmbeddings)).asRetriever();
+    return (
+      await Chroma.fromExistingCollection(embeddings, {
+        collectionName: collectionName
+      })
+    ).asRetriever();
   }
 
-  if (docs && directory) {
+  if (docs) {
     console.log('creating vector store...');
-    const inMemoryStore = new InMemoryStore();
-    const cacheBackedEmbeddings = CacheBackedEmbeddings.fromBytesStore(
-      underlyingEmbeddings,
-      inMemoryStore,
-      { namespace: underlyingEmbeddings.modelName }
-    );
-    const vectorStore = await HNSWLib.fromDocuments(
-      docs,
-      cacheBackedEmbeddings
-    );
-    await vectorStore.save(directory);
-    return vectorStore.asRetriever();
+    return (
+      await Chroma.fromDocuments(docs, embeddings, {
+        collectionName: collectionName
+      })
+    ).asRetriever();
   }
 
   throw new Error(
