@@ -7,14 +7,14 @@ export async function vectorStoreRetriever(
   collectionName: string,
   docs?: Document<Record<string, any>>[]
 ): Promise<VectorStoreRetriever<Chroma>> {
-
   const embeddings = new OpenAIEmbeddings();
 
   if (!docs) {
     console.log('loading vector store...');
     return (
       await Chroma.fromExistingCollection(embeddings, {
-        collectionName: collectionName
+        collectionName: collectionName,
+        url: 'chroma-production-9178.up.railway.app'
       })
     ).asRetriever();
   }
@@ -23,7 +23,8 @@ export async function vectorStoreRetriever(
     console.log('creating vector store...');
     return (
       await Chroma.fromDocuments(docs, embeddings, {
-        collectionName: collectionName
+        collectionName: collectionName,
+        url: 'chroma-production-9178.up.railway.app'
       })
     ).asRetriever();
   }
