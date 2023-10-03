@@ -14,7 +14,7 @@ export async function vectorStoreRetriever(
     return (
       await Chroma.fromExistingCollection(embeddings, {
         collectionName: collectionName,
-        url: 'chroma-production-9178.up.railway.app'
+        url: process.env.CHROMA_DB_URL
       })
     ).asRetriever();
   }
@@ -24,7 +24,7 @@ export async function vectorStoreRetriever(
     return (
       await Chroma.fromDocuments(docs, embeddings, {
         collectionName: collectionName,
-        url: 'chroma-production-9178.up.railway.app'
+        url: process.env.CHROMA_DB_URL
       })
     ).asRetriever();
   }
