@@ -6,6 +6,8 @@ import 'styles/main.css';
 
 export const dynamic = 'force-dynamic';
 
+export const revalidate = 0
+
 const meta = {
   title: 'Next.js Subscription Starter',
   description: 'Brought to you by Vercel, Stripe, and Supabase.',
