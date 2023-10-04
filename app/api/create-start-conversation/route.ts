@@ -52,14 +52,8 @@ async function formResponse(res: any): Promise<NextResponse> {
   });
 }
 
-export const forceRevalidate = (request: NextRequest) => {
-  const path = request.nextUrl.searchParams.get('path') || '/';
-  revalidatePath(path);
-};
-
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    forceRevalidate(request);
     const { question, history, collectionName } = await parseRequest(request);
     const chain = await getChain(collectionName);
     const res = await chain.call({
