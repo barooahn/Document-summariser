@@ -5,8 +5,9 @@ import { PropsWithChildren } from 'react';
 import 'styles/main.css';
 
 export const dynamic = 'force-dynamic';
-
-export const revalidate = 0
+// trying to stop caching
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
 
 const meta = {
   title: 'Next.js Subscription Starter',
