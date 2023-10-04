@@ -2,7 +2,6 @@ import { vectorStoreRetriever } from '@/app/api-helpers/vector-store';
 import { llm } from '@/app/config';
 import { Message } from '@/types/message';
 import { ConversationalRetrievalQAChain } from 'langchain/chains';
-import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const revalidate = 0;
@@ -12,7 +11,9 @@ let chainPromise: Promise<ConversationalRetrievalQAChain> | null = null;
 async function initChain(
   collectionName: string
 ): Promise<ConversationalRetrievalQAChain> {
+  console.log('attempting to load vector store...');
   const vsr = await vectorStoreRetriever(collectionName);
+  console.log('have vector store...', vsr !== null);
   return ConversationalRetrievalQAChain.fromLLM(llm, vsr, {
     returnSourceDocuments: true
   });
