@@ -4,43 +4,65 @@ import { Message } from '@/types/message';
 import { ConversationalRetrievalQAChain } from 'langchain/chains';
 import { NextResponse } from 'next/server';
 
-let chain: ConversationalRetrievalQAChain | null = null;
+let chainPromise: Promise<ConversationalRetrievalQAChain> | null = null;
 
 async function initChain(
   collectionName: string
 ): Promise<ConversationalRetrievalQAChain> {
   const vsr = await vectorStoreRetriever(collectionName);
-  console.log('vsr', vsr);
   return ConversationalRetrievalQAChain.fromLLM(llm, vsr, {
     returnSourceDocuments: true
   });
 }
 
+async function getChain(
+  collectionName: string
+): Promise<ConversationalRetrievalQAChain> {
+  if (!chainPromise) {
+    chainPromise = initChain(collectionName);
+  }
+  return await chainPromise;
+}
+
+async function parseRequest(
+  request: Request
+): Promise<{ question: string; history: Message[]; collectionName: string }> {
+  const body = await request.json();
+  if (
+    typeof body.query !== 'string' ||
+    typeof body.collectionName !== 'string' ||
+    !Array.isArray(body.history)
+  ) {
+    throw new Error('Bad Request');
+  }
+  return {
+    question: body.query,
+    history: body.history ?? [],
+    collectionName: body.collectionName ?? ''
+  };
+}
+
+async function formResponse(res: any): Promise<NextResponse> {
+  return NextResponse.json({
+    role: 'assistant',
+    content: res.text
+  });
+}
+
 export async function POST(request: Request): Promise<NextResponse> {
   try {
-    const body = await request.json();
-    const question: string = body.query;
-    const history: Message[] = body.history ?? [];
-    const collectionName: string = body.collectionName ?? '';
-
-    if (!chain) {
-      chain = await initChain(collectionName);
-    }
-
+    const { question, history, collectionName } = await parseRequest(request);
+    const chain = await getChain(collectionName);
     const res = await chain.call({
       question: question,
       chat_history: history.map((h) => h.content).join('\n')
     });
-
-    return NextResponse.json({
-      role: 'assistant',
-      content: res.text
-    });
+    return await formResponse(res);
   } catch (error) {
     console.error(error);
     return new NextResponse(
-      JSON.stringify({ error: 'Internal Server Error' }),
-      { status: 500 }
+      JSON.stringify({ error: (error as Error).message }),
+      { status: (error as Error).message === 'Bad Request' ? 400 : 500 }
     );
   }
 }
