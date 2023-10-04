@@ -11,6 +11,7 @@ export async function vectorStoreRetriever(
 
   if (!docs) {
     console.log('loading vector store...');
+    console.log('collectionName', collectionName);
     return (
       await Chroma.fromExistingCollection(embeddings, {
         collectionName: collectionName,
@@ -21,6 +22,7 @@ export async function vectorStoreRetriever(
 
   if (docs) {
     console.log('creating vector store...');
+    console.log('collectionName', collectionName);
     return (
       await Chroma.fromDocuments(docs, embeddings, {
         collectionName: collectionName,
