@@ -10,7 +10,7 @@ export async function vectorStoreRetriever(
   const embeddings = new OpenAIEmbeddings();
 
   console.log(!docs ? 'no docs' : 'docs');
-  console.log(collectionName ? collectionName : 'no collection name');
+  console.log(collectionName || 'no collection name');
 
   if (!docs && collectionName) {
     console.log('loading vector store...');
@@ -35,5 +35,6 @@ export async function vectorStoreRetriever(
     ).asRetriever();
   }
 
+  console.log('Documents and collectionName must be provided.');
   throw new Error('Documents and collectionName must be provided.');
 }
