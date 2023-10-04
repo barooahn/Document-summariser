@@ -9,7 +9,7 @@ export async function vectorStoreRetriever(
 ): Promise<VectorStoreRetriever<Chroma>> {
   const embeddings = new OpenAIEmbeddings();
 
-  if (!docs) {
+  if (!docs && collectionName) {
     console.log('loading vector store...');
     console.log('collectionName', collectionName);
     return (
@@ -20,7 +20,7 @@ export async function vectorStoreRetriever(
     ).asRetriever();
   }
 
-  if (docs) {
+  if (docs && collectionName) {
     console.log('creating vector store...');
     console.log('collectionName', collectionName);
     return (
@@ -31,7 +31,5 @@ export async function vectorStoreRetriever(
     ).asRetriever();
   }
 
-  throw new Error(
-    'Either documents or VECTORSTORES directory must be provided.'
-  );
+  throw new Error('Documents and collectionName must be provided.');
 }
