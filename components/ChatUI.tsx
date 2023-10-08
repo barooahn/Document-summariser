@@ -5,9 +5,11 @@ import { Message } from '@/types/message';
 import { useState, useRef, useEffect } from 'react';
 import { Send } from 'react-feather';
 import '@/styles/chat-styles.css';
+import { Document } from 'langchain/dist/document';
 
 type ChatUIProps = {
   collectionName: string;
+  docs: Document<Record<string, any>>[];
 };
 
 export default function ChatUI(props: ChatUIProps) {
@@ -37,7 +39,8 @@ export default function ChatUI(props: ChatUIProps) {
       body: JSON.stringify({
         query: message,
         history: history,
-        collectionName: props.collectionName
+        // collectionName: props.collectionName,
+        docs: props.docs
       })
     })
       .then(async (res) => {

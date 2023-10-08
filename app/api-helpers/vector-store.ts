@@ -1,40 +1,22 @@
 import { Document } from 'langchain/dist/document';
 import { VectorStoreRetriever } from 'langchain/dist/vectorstores/base';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
-import { Chroma } from 'langchain/vectorstores/chroma';
+import { MemoryVectorStore } from 'langchain/vectorstores/memory';
 
 export async function vectorStoreRetriever(
-  collectionName: string,
-  docs?: Document<Record<string, any>>[]
-): Promise<VectorStoreRetriever<Chroma>> {
+  docs: Document<Record<string, any>>[]
+): Promise<VectorStoreRetriever<MemoryVectorStore>> {
   const embeddings = new OpenAIEmbeddings();
 
-  console.log(!docs ? 'no docs' : 'docs');
-  console.log(collectionName || 'no collection name');
+  console.log('docs', docs);
 
-  if (!docs && collectionName) {
-    console.log('loading vector store...');
-    console.log('collectionName', collectionName);
-
-    return (
-      await Chroma.fromExistingCollection(embeddings, {
-        collectionName: collectionName,
-        url: process.env.CHROMA_DB_URL
-      })
-    ).asRetriever();
-  }
-
-  if (docs && collectionName) {
+  if (docs) {
     console.log('creating vector store...');
-    console.log('collectionName', collectionName);
     return (
-      await Chroma.fromDocuments(docs, embeddings, {
-        collectionName: collectionName,
-        url: process.env.CHROMA_DB_URL
-      })
+      await MemoryVectorStore.fromDocuments(docs, embeddings)
     ).asRetriever();
   }
 
-  console.log('Documents and collectionName must be provided.');
-  throw new Error('Documents and collectionName must be provided.');
+  console.log('Documents and  must be provided.');
+  throw new Error('Documents and  must be provided.');
 }

@@ -30,9 +30,8 @@ export async function POST(req: Request, res: any) {
 
     const pdfLoader = new PDFLoader(tempFileName);
     const docsUploaded = await pdfLoader.load();
-    const collectionName = `pdf_${Date.now()}`;
+    // const collectionName = `pdf_${Date.now()}`;
 
-    // May need to split documents later
     const splitter = new CharacterTextSplitter({
       separator: ' ',
       chunkSize: 1000,
@@ -40,7 +39,7 @@ export async function POST(req: Request, res: any) {
     });
     const docs = await splitter.splitDocuments(docsUploaded);
 
-    const vsr = vectorStoreRetriever(collectionName, docs);
+    const vsr = vectorStoreRetriever(docs);
 
     const chain = RetrievalQAChain.fromLLM(llm, await vsr);
     console.log('querying chain');
@@ -54,7 +53,8 @@ export async function POST(req: Request, res: any) {
       message: 'File was uploaded successfully',
       payload: {
         chainResponse: chainResponse,
-        collectionName: collectionName
+        // collectionName: collectionName,
+        docs: docs
       }
     };
 

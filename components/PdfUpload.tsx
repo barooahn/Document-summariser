@@ -2,6 +2,7 @@
 
 import ChatUI from './ChatUI';
 import { Dropzone, ExtFile, FileMosaic } from '@dropzone-ui/react';
+import { Document } from 'langchain/dist/document';
 import React, { useState } from 'react';
 
 type ServerResponse = {
@@ -12,6 +13,7 @@ type ServerResponse = {
       text: string;
     };
     collectionName: string;
+    docs: Document<Record<string, any>>[];
   };
 };
 
@@ -20,6 +22,7 @@ const PDFUploader: React.FC = () => {
   const [files, setFiles] = useState<ExtFile[]>([]);
 
   const collectionName = pdfSummary?.payload?.collectionName || '';
+  const docs = pdfSummary?.payload?.docs;
 
   const handleFilesChange = (incomingFiles: ExtFile[]) => {
     const { uploadStatus, errors, xhr } = incomingFiles[0];
@@ -70,7 +73,7 @@ const PDFUploader: React.FC = () => {
             <p>{pdfSummary.payload.chainResponse?.text}</p>
           </section>
           <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-4">
-            <ChatUI collectionName={collectionName} />
+            <ChatUI collectionName={collectionName} docs={docs ?? []} />
           </section>
         </>
       )}
