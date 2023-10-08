@@ -8,8 +8,6 @@ export async function vectorStoreRetriever(
 ): Promise<VectorStoreRetriever<MemoryVectorStore>> {
   const embeddings = new OpenAIEmbeddings();
 
-  console.log('docs', docs);
-
   if (docs) {
     console.log('creating vector store...');
     return (

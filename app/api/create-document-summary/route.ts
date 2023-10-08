@@ -30,7 +30,6 @@ export async function POST(req: Request, res: any) {
 
     const pdfLoader = new PDFLoader(tempFileName);
     const docsUploaded = await pdfLoader.load();
-    // const collectionName = `pdf_${Date.now()}`;
 
     const splitter = new CharacterTextSplitter({
       separator: ' ',
@@ -44,16 +43,20 @@ export async function POST(req: Request, res: any) {
     const chain = RetrievalQAChain.fromLLM(llm, await vsr);
     console.log('querying chain');
     const chainResponse = await chain.call({
-      query: 'Summarize the document in 100 words or less?'
+      query:
+        'Summarize the document in 100 words or less.  Format the reply into logical paragraphs using HTML syntax.  Highligh important facts in bold.  Compile and display in an unordered list the ten most important of the document'
     });
-    console.log({ chainResponse });
+    const chainResponse2 = await chain.call({
+      query:
+        'list the ten most important points of the document Format the reply into a HTML unordered list '
+    });
 
     const responsePayload = {
       success: true,
       message: 'File was uploaded successfully',
       payload: {
         chainResponse: chainResponse,
-        // collectionName: collectionName,
+        chainResponse2: chainResponse2,
         docs: docs
       }
     };
@@ -71,7 +74,6 @@ export async function POST(req: Request, res: any) {
       };
       return NextResponse.json(errorPayload, { status: 500 });
     } else {
-      // error is something else (not an instance of Error)
       const errorPayload = {
         success: false,
         message: 'An unknown error occurred',

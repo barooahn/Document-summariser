@@ -1,15 +1,19 @@
 'use client';
 
 import ChatUI from './ChatUI';
+import Button from './ui/Button';
 import { Dropzone, ExtFile, FileMosaic } from '@dropzone-ui/react';
 import { Document } from 'langchain/dist/document';
-import React, { useState } from 'react';
+import React, { DOMAttributes, useEffect, useRef, useState } from 'react';
 
 type ServerResponse = {
   success: boolean;
   message: string;
   payload: {
     chainResponse: {
+      text: string;
+    };
+    chainResponse2: {
       text: string;
     };
     collectionName: string;
@@ -19,7 +23,9 @@ type ServerResponse = {
 
 const PDFUploader: React.FC = () => {
   const [pdfSummary, setPdfSummary] = useState<ServerResponse | null>(null);
+  const pdfSummaryRef = useRef<HTMLDivElement | null>(null);
   const [files, setFiles] = useState<ExtFile[]>([]);
+  const [chat, setChat] = useState<boolean>(false);
 
   const collectionName = pdfSummary?.payload?.collectionName || '';
   const docs = pdfSummary?.payload?.docs;
@@ -44,6 +50,13 @@ const PDFUploader: React.FC = () => {
       console.log('incomingFiles[0]?.errors', errors);
     }
   };
+
+  //scroll to summary
+  useEffect(() => {
+    if (pdfSummaryRef.current) {
+      pdfSummaryRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [history]);
 
   return (
     <>
@@ -70,12 +83,36 @@ const PDFUploader: React.FC = () => {
       {pdfSummary && (
         <>
           <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-4">
-            <p>{pdfSummary.payload.chainResponse?.text}</p>
+            <div
+              ref={pdfSummaryRef}
+              dangerouslySetInnerHTML={{
+                __html: pdfSummary.payload.chainResponse?.text
+              }}
+            />
+            <h2 className="text-2xl my-8 font-extrabold text-pink-500 sm:text-center sm:text-6xl">
+              Key points about the document
+            </h2>
+            <div
+              className="flex flex-col"
+              dangerouslySetInnerHTML={{
+                __html: pdfSummary.payload.chainResponse2?.text
+              }}
+            />
           </section>
-          <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-4">
-            <ChatUI collectionName={collectionName} docs={docs ?? []} />
-          </section>
+          <div className="flex justify-center">
+            <Button
+              onClick={() => setChat(true)}
+              className={`${'ml-0.5 my-8 relative w-1/2 border border-transparent text-zinc-400'} rounded-md m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 focus:z-10 sm:w-auto sm:px-8`}
+            >
+              Chat now
+            </Button>
+          </div>
         </>
+      )}
+      {chat && (
+        <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-4">
+          <ChatUI collectionName={collectionName} docs={docs ?? []} />
+        </section>
       )}
     </>
   );

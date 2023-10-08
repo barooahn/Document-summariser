@@ -74,7 +74,7 @@ export default function ChatUI(props: ChatUIProps) {
   }, [history]);
 
   return (
-    <main className="h-screen bg-black flex flex-col w-full">
+    <main className="h-96 bg-black flex flex-col w-full">
       <div className="flex flex-col gap-8 w-full items-center flex-grow max-h-full">
         <h1 className="sm:text-2xl lg:text-4xl text-white font-extralight">
           Ask me about your document
@@ -86,7 +86,7 @@ export default function ChatUI(props: ChatUIProps) {
             handleClick();
           }}
         >
-          <div className="overflow-y-auto flex flex-col gap-2 p-4 h-full">
+          <div className="overflow-y-auto flex flex-col gap-2 p-4 h-96">
             {history.map((message: Message, idx) => {
               const isLastMessage = idx === history.length - 1;
               switch (message.role) {

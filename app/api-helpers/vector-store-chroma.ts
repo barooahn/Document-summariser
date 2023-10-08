@@ -9,9 +9,6 @@ export async function vectorStoreRetriever(
 ): Promise<VectorStoreRetriever<Chroma>> {
   const embeddings = new OpenAIEmbeddings();
 
-  console.log(!docs ? 'no docs' : 'docs');
-  console.log(collectionName || 'no collection name');
-
   if (!docs && collectionName) {
     console.log('loading vector store...');
     console.log('collectionName', collectionName);

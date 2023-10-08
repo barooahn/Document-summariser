@@ -11,9 +11,9 @@ async function initChain(
   // collectionName: string,
   docs: Document<Record<string, any>>[]
 ): Promise<ConversationalRetrievalQAChain> {
-  console.log('attempting to load vector store...');
+  console.log('Attempting to create vector store...');
   const vsr = await vectorStoreRetriever(docs);
-  console.log('have vector store...', vsr !== null);
+  console.log('Created vector store...', vsr !== null);
   return ConversationalRetrievalQAChain.fromLLM(llm, vsr, {
     returnSourceDocuments: true
   });
