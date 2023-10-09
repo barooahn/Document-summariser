@@ -8,6 +8,8 @@ import { NextResponse } from 'next/server';
 import os from 'os';
 import path from 'path';
 
+
+export const maxDuration = 30;
 export async function POST(req: Request, res: any) {
   try {
     if (req.method !== 'POST') {

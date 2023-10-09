@@ -58,6 +58,7 @@ async function formResponse(res: any): Promise<NextResponse> {
   });
 }
 
+export const maxDuration = 30;
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const { question, history, docs } = await parseRequest(request);
