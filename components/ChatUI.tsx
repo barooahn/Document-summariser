@@ -8,7 +8,7 @@ import '@/styles/chat-styles.css';
 import { Document } from 'langchain/dist/document';
 
 type ChatUIProps = {
-  collectionName: string;
+  // collectionName: string;
   docs: Document<Record<string, any>>[];
 };
 
@@ -35,7 +35,6 @@ export default function ChatUI(props: ChatUIProps) {
     fetch('/api/create-start-conversation', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      next: { revalidate: 0 },
       body: JSON.stringify({
         query: message,
         history: history,

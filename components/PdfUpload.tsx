@@ -20,6 +20,13 @@ type ServerResponse = {
     docs: Document<Record<string, any>>[];
   };
 };
+type ServerFileResponse = {
+  success: boolean;
+  message: string;
+  payload: {
+    fileName: string;
+  };
+};
 
 const PDFUploader: React.FC = () => {
   const [pdfSummary, setPdfSummary] = useState<ServerResponse | null>(null);
@@ -27,29 +34,56 @@ const PDFUploader: React.FC = () => {
   const [files, setFiles] = useState<ExtFile[]>([]);
   const [chat, setChat] = useState<boolean>(false);
 
-  const collectionName = pdfSummary?.payload?.collectionName || '';
+  // const collectionName = pdfSummary?.payload?.collectionName || '';
   const docs = pdfSummary?.payload?.docs;
 
-  const handleFilesChange = (incomingFiles: ExtFile[]) => {
-    const { uploadStatus, errors, xhr } = incomingFiles[0];
+  const createDocsFromFile = async (
+    fileName: string
+  ): Promise<Document<Record<string, any>>[]> => {
+    try {
+      const response = await fetch('/api/create-docs-from-file', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName: fileName
+        })
+      });
 
-    setFiles(incomingFiles);
-    if (uploadStatus === 'success' && xhr?.response) {
-      try {
-        const parsedResponse: ServerResponse = JSON.parse(xhr?.response);
-        setPdfSummary(parsedResponse);
-      } catch (error) {
-        console.error('Failed to parse server response:', error);
-        console.error('Response:', xhr?.response);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch vector store: ${response.statusText}`);
       }
-    }
-    if (uploadStatus === 'error') {
-      console.error('Upload Error:', xhr?.statusText);
-    }
-    if (errors) {
-      console.log('incomingFiles[0]?.errors', errors);
+
+      const data = await response.json();
+      return data as Document<Record<string, any>>[];
+    } catch (error) {
+      console.error(error);
+      throw error; // Re-throw the error so it can be handled upstream
     }
   };
+
+  // const handleFilesChange = (incomingFiles: ExtFile[]) => {
+  //   const { uploadStatus, errors, xhr } = incomingFiles[0];
+
+  //   setFiles(incomingFiles);
+  //   if (uploadStatus === 'success' && xhr?.response) {
+  //     try {
+  //       const filesResponse: ServerFileResponse = xhr?.response;
+  //       setFileName(filesResponse);
+
+  //       // const parsedResponse: ServerResponse = JSON.parse(xhr?.response);
+  //       // setPdfSummary(parsedResponse);
+  //     } catch (error) {
+  //       console.error('Failed to get filename response:', error);
+  //       console.error('Response:', xhr?.response);
+  //     }
+  //   }
+  //   if (uploadStatus === 'error') {
+  //     console.error('Upload Error:', xhr?.statusText);
+  //   }
+  //   if (errors) {
+  //     console.log('incomingFiles[0]?.errors', errors);
+  //   }
+  // };
 
   //scroll to summary
   useEffect(() => {
@@ -58,22 +92,52 @@ const PDFUploader: React.FC = () => {
     }
   }, [history]);
 
+  const handleChangeStatus = async (file: ExtFile[]) => {
+    if (file[0]?.xhr?.status === 200 && file[0]?.xhr?.responseText) {
+      try {
+        const docs = await createDocsFromFile(
+          JSON.parse(file[0]?.xhr?.responseText).payload
+        );
+        const response = await fetch('/api/create-document-summary', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            docs: docs
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to create document summary: ${response.statusText}`
+          );
+        }
+
+        const data = await response.json();
+        setPdfSummary(data);
+      } catch (error) {
+        console.error(error);
+        // Optionally set some state to indicate an error occurred
+      }
+    }
+  };
+
   return (
     <>
       <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-8">
         <Dropzone
-          onChange={handleFilesChange}
+          // onChange={handleFilesChange}
           maxFiles={1}
           clickable={true}
           accept="application/pdf"
           value={files}
           label="Drop PDF or click to upload your document"
           uploadConfig={{
-            url: '/api/create-document-summary',
+            url: '/api/create-processed-file',
             method: 'POST',
             cleanOnUpload: true,
             autoUpload: true
           }}
+          onChange={handleChangeStatus}
         >
           {files.map((file, index) => (
             <FileMosaic key={file.id} {...file} preview />
@@ -111,7 +175,7 @@ const PDFUploader: React.FC = () => {
       )}
       {chat && (
         <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-4">
-          <ChatUI collectionName={collectionName} docs={docs ?? []} />
+          <ChatUI docs={docs ?? []} />
         </section>
       )}
     </>
