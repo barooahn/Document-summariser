@@ -89,15 +89,15 @@ const PDFUploader: React.FC = () => {
                 __html: pdfSummary.payload.chainResponse?.text
               }}
             />
-            <h2 className="text-2xl my-8 font-extrabold text-pink-500 sm:text-center sm:text-6xl">
+            {/* <h2 className="text-2xl my-8 font-extrabold text-pink-500 sm:text-center sm:text-6xl">
               Key points about the document
             </h2>
-            {/* <div
+            <div
               className="flex flex-col"
               dangerouslySetInnerHTML={{
                 __html: pdfSummary.payload.chainResponse2?.text
               }}
-            /> */}
+            />*/}
           </section>
           <div className="flex justify-center">
             <Button

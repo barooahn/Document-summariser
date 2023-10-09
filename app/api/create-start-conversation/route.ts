@@ -64,7 +64,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const chain = await getChain(docs);
     const res = await chain.call({
       question: question,
-      chat_history: history.map((h) => h.content).join('\n')
+      chat_history: history.map((h) => h.content).join('\n'),
+      callbacks: [
+        {
+          handleLLMNewToken(token: string) {
+            // console.log({ token });
+          }
+        }
+      ]
     });
     return await formResponse(res);
   } catch (error) {

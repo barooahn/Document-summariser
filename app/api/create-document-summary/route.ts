@@ -44,12 +44,27 @@ export async function POST(req: Request, res: any) {
     console.log('querying chain');
     const chainResponse = await chain.call({
       query:
-        'Summarize the document in 100 words or less.  Format the reply into logical paragraphs using HTML syntax.  Highligh important facts in bold.'
+        'Summarize the document in 100 words or less.  Format the reply into logical paragraphs using HTML syntax.  Highligh important facts in bold.',
+      callbacks: [
+        {
+          handleLLMNewToken(token: string) {
+            // console.log({ token });
+          }
+        }
+      ]
     });
     // const chainResponse2 = await chain.call({
     //   query:
-    //     'list the ten most important points of the document Format the reply into a HTML unordered list '
+    //     'list the ten most important points of the document Format the reply into a HTML unordered list ',
+    //   callbacks: [
+    //     {
+    //       handleLLMNewToken(token: string) {
+    //         // console.log({ token });
+    //       }
+    //     }
+    //   ]
     // });
+    // const chainResponse2 = '';
 
     const responsePayload = {
       success: true,
