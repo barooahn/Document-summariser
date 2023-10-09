@@ -8,7 +8,6 @@ import { NextResponse } from 'next/server';
 import os from 'os';
 import path from 'path';
 
-
 export const maxDuration = 30;
 export async function POST(req: Request, res: any) {
   try {
@@ -48,17 +47,17 @@ export async function POST(req: Request, res: any) {
       query:
         'Summarize the document in 100 words or less.  Format the reply into logical paragraphs using HTML syntax.  Highligh important facts in bold.  Compile and display in an unordered list the ten most important of the document'
     });
-    const chainResponse2 = await chain.call({
-      query:
-        'list the ten most important points of the document Format the reply into a HTML unordered list '
-    });
+    // const chainResponse2 = await chain.call({
+    //   query:
+    //     'list the ten most important points of the document Format the reply into a HTML unordered list '
+    // });
 
     const responsePayload = {
       success: true,
       message: 'File was uploaded successfully',
       payload: {
         chainResponse: chainResponse,
-        chainResponse2: chainResponse2,
+        // chainResponse2: chainResponse2,
         docs: docs
       }
     };
