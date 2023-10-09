@@ -13,9 +13,9 @@ type ServerResponse = {
     chainResponse: {
       text: string;
     };
-    chainResponse2: {
-      text: string;
-    };
+    // chainResponse2: {
+    //   text: string;
+    // };
     collectionName: string;
     docs: Document<Record<string, any>>[];
   };
@@ -92,12 +92,12 @@ const PDFUploader: React.FC = () => {
             <h2 className="text-2xl my-8 font-extrabold text-pink-500 sm:text-center sm:text-6xl">
               Key points about the document
             </h2>
-            <div
+            {/* <div
               className="flex flex-col"
               dangerouslySetInnerHTML={{
                 __html: pdfSummary.payload.chainResponse2?.text
               }}
-            />
+            /> */}
           </section>
           <div className="flex justify-center">
             <Button

@@ -8,7 +8,6 @@ import { NextResponse } from 'next/server';
 import os from 'os';
 import path from 'path';
 
-export const maxDuration = 30;
 export async function POST(req: Request, res: any) {
   try {
     if (req.method !== 'POST') {
@@ -45,7 +44,7 @@ export async function POST(req: Request, res: any) {
     console.log('querying chain');
     const chainResponse = await chain.call({
       query:
-        'Summarize the document in 100 words or less.  Format the reply into logical paragraphs using HTML syntax.  Highligh important facts in bold.  Compile and display in an unordered list the ten most important of the document'
+        'Summarize the document in 100 words or less.  Format the reply into logical paragraphs using HTML syntax.  Highligh important facts in bold.'
     });
     // const chainResponse2 = await chain.call({
     //   query:
