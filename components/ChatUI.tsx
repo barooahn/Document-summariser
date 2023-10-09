@@ -94,10 +94,10 @@ export default function ChatUI(props: ChatUIProps) {
                   return (
                     <div
                       ref={isLastMessage ? lastMessageRef : null}
-                      key={idx}
+                      key={`chat-wrapper-${idx.toString()}`}
                       className="flex gap-2"
                     >
-                      <div className="w-auto max-w-xl break-words bg-black rounded-b-xl rounded-tr-xl text-white p-6 shadow-[0_10px_40px_0px_rgba(0,0,0,0.15)]">
+                      <div className="w-auto max-w-xl break-words bg-black rounded-b-xl rounded-tr-xl text-white p-6">
                         <p className="text-sm font-medium text-pink-500 mb-2">
                           AI assistant
                         </p>
@@ -127,8 +127,8 @@ export default function ChatUI(props: ChatUIProps) {
                 case 'user':
                   return (
                     <div
-                      className="w-auto max-w-xl break-words bg-black rounded-b-xl rounded-tl-xl text-white p-6 self-end "
-                      key={idx}
+                      className="w-auto max-w-xl break-words bg-black rounded-b-xl rounded-tl-xl text-white p-6 self-end"
+                      key={`${message.content}-${idx.toString()}`}
                       ref={isLastMessage ? lastMessageRef : null}
                     >
                       <p className="text-sm font-medium text-pink-500 mb-2">
