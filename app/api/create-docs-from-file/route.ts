@@ -4,7 +4,6 @@ import { CharacterTextSplitter } from 'langchain/text_splitter';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextResponse } from 'next/server';
 
-
 // Define any additional types you might need
 interface ErrorResponse {
   success: false;
@@ -19,7 +18,7 @@ export interface SuccessDocsResponse {
 
 type ApiResponse = ErrorResponse | SuccessDocsResponse;
 
-export const POST = async function (
+export async function POST(
   req: NextApiRequest,
   res: NextApiResponse<ApiResponse>
 ) {
@@ -77,4 +76,4 @@ export const POST = async function (
     };
     return NextResponse.json(errorResponse, { status: 500 });
   }
-};
+}
