@@ -61,10 +61,10 @@ export default function ChatUI(props: ChatUIProps) {
 
   return (
     <section className="h-120 bg-black flex flex-col w-full" ref={chatRef}>
-      <div className="flex flex-col gap-8 w-full items-center flex-grow max-h-full">
+      <div className="flex flex-col gap-8 w-full flex-grow max-h-full">
         <p
           ref={chatRef}
-          className="text-xl pt-6 font-extrabold text-pink-500 lg:text-4xl"
+          className="text-xl pt-6 text-left font-extrabold text-pink-500 lg:text-4xl"
         >
           Ask me about your document
         </p>
