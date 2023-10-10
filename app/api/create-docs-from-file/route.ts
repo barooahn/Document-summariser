@@ -1,7 +1,9 @@
-import fs from 'fs/promises';
+import { Document } from 'langchain/dist/document';
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
 import { CharacterTextSplitter } from 'langchain/text_splitter';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
+
 
 // Define any additional types you might need
 interface ErrorResponse {
@@ -10,12 +12,12 @@ interface ErrorResponse {
   payload: Record<string, unknown>;
 }
 
-interface SuccessResponse {
+export interface SuccessDocsResponse {
   success: true;
-  result: any; // Replace 'any' with the actual type of your result
+  docs: Document<Record<string, any>>[]; // Replace 'any' with the actual type of your result
 }
 
-type ApiResponse = ErrorResponse | SuccessResponse;
+type ApiResponse = ErrorResponse | SuccessDocsResponse;
 
 export const POST = async function (
   req: NextApiRequest,
@@ -30,8 +32,14 @@ export const POST = async function (
       };
       return res.status(405).json(errorPayload);
     }
-
-    const fileName = req.body.fileName as string;
+    const chunks = [];
+    for await (const chunk of req.body) {
+      chunks.push(chunk);
+    }
+    const body = Buffer.concat(chunks).toString();
+    const parsedBody = JSON.parse(body);
+    const fileName = parsedBody.fileName;
+    console.log('fileName', fileName);
 
     const pdfLoader = new PDFLoader(fileName);
     const docsUploaded = await pdfLoader.load();
@@ -42,14 +50,14 @@ export const POST = async function (
       chunkOverlap: 200
     });
 
-    const result = await splitter.splitDocuments(docsUploaded);
+    const docs = await splitter.splitDocuments(docsUploaded);
 
     try {
-      const successResponse: SuccessResponse = {
+      const successResponse: SuccessDocsResponse = {
         success: true,
-        result
+        docs
       };
-      res.status(200).json(successResponse);
+      return NextResponse.json(successResponse, { status: 200 });
     } catch (error) {
       console.error(error);
       const errorResponse: ErrorResponse = {
@@ -57,7 +65,8 @@ export const POST = async function (
         message: 'Internal Server Error',
         payload: {}
       };
-      res.status(500).json(errorResponse);
+
+      return NextResponse.json(errorResponse, { status: 500 });
     }
   } catch (error) {
     console.error(error);
@@ -66,6 +75,6 @@ export const POST = async function (
       message: 'Internal Server Error',
       payload: {}
     };
-    res.status(500).json(errorResponse);
+    return NextResponse.json(errorResponse, { status: 500 });
   }
 };

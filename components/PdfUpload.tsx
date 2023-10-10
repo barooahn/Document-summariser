@@ -2,9 +2,10 @@
 
 import ChatUI from './ChatUI';
 import Button from './ui/Button';
+import { SuccessDocsResponse } from '@/app/api/create-docs-from-file/route';
 import { Dropzone, ExtFile, FileMosaic } from '@dropzone-ui/react';
 import { Document } from 'langchain/dist/document';
-import React, { DOMAttributes, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 type ServerResponse = {
   success: boolean;
@@ -13,18 +14,11 @@ type ServerResponse = {
     chainResponse: {
       text: string;
     };
-    // chainResponse2: {
-    //   text: string;
-    // };
+    chainResponse2: {
+      text: string;
+    };
     collectionName: string;
     docs: Document<Record<string, any>>[];
-  };
-};
-type ServerFileResponse = {
-  success: boolean;
-  message: string;
-  payload: {
-    fileName: string;
   };
 };
 
@@ -33,13 +27,11 @@ const PDFUploader: React.FC = () => {
   const pdfSummaryRef = useRef<HTMLDivElement | null>(null);
   const [files, setFiles] = useState<ExtFile[]>([]);
   const [chat, setChat] = useState<boolean>(false);
-
-  // const collectionName = pdfSummary?.payload?.collectionName || '';
-  const docs = pdfSummary?.payload?.docs;
+  const [docs, setDocs] = useState<Document<Record<string, any>>[] | []>([]);
 
   const createDocsFromFile = async (
     fileName: string
-  ): Promise<Document<Record<string, any>>[]> => {
+  ): Promise<SuccessDocsResponse> => {
     try {
       const response = await fetch('/api/create-docs-from-file', {
         method: 'POST',
@@ -54,36 +46,12 @@ const PDFUploader: React.FC = () => {
       }
 
       const data = await response.json();
-      return data as Document<Record<string, any>>[];
+      return data as SuccessDocsResponse;
     } catch (error) {
       console.error(error);
       throw error; // Re-throw the error so it can be handled upstream
     }
   };
-
-  // const handleFilesChange = (incomingFiles: ExtFile[]) => {
-  //   const { uploadStatus, errors, xhr } = incomingFiles[0];
-
-  //   setFiles(incomingFiles);
-  //   if (uploadStatus === 'success' && xhr?.response) {
-  //     try {
-  //       const filesResponse: ServerFileResponse = xhr?.response;
-  //       setFileName(filesResponse);
-
-  //       // const parsedResponse: ServerResponse = JSON.parse(xhr?.response);
-  //       // setPdfSummary(parsedResponse);
-  //     } catch (error) {
-  //       console.error('Failed to get filename response:', error);
-  //       console.error('Response:', xhr?.response);
-  //     }
-  //   }
-  //   if (uploadStatus === 'error') {
-  //     console.error('Upload Error:', xhr?.statusText);
-  //   }
-  //   if (errors) {
-  //     console.log('incomingFiles[0]?.errors', errors);
-  //   }
-  // };
 
   //scroll to summary
   useEffect(() => {
@@ -93,11 +61,12 @@ const PDFUploader: React.FC = () => {
   }, [history]);
 
   const handleChangeStatus = async (file: ExtFile[]) => {
+    setFiles(file);
     if (file[0]?.xhr?.status === 200 && file[0]?.xhr?.responseText) {
+      const fileNameObj = JSON.parse(file[0]?.xhr?.responseText).payload;
       try {
-        const docs = await createDocsFromFile(
-          JSON.parse(file[0]?.xhr?.responseText).payload
-        );
+        const docs = (await createDocsFromFile(fileNameObj.filename)).docs;
+        setDocs(docs);
         const response = await fetch('/api/create-document-summary', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -125,7 +94,6 @@ const PDFUploader: React.FC = () => {
     <>
       <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-8">
         <Dropzone
-          // onChange={handleFilesChange}
           maxFiles={1}
           clickable={true}
           accept="application/pdf"
@@ -161,7 +129,7 @@ const PDFUploader: React.FC = () => {
               dangerouslySetInnerHTML={{
                 __html: pdfSummary.payload.chainResponse2?.text
               }}
-            />*/}
+            /> */}
           </section>
           <div className="flex justify-center">
             <Button
