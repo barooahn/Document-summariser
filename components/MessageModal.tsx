@@ -22,7 +22,7 @@ export const MessageModal: FC<ModalProps> = ({ message, pdfSummary }) => {
     isOpen && (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-8 shadow-lg">
-          <span className="text-gray-700">{message}</span>
+          <span className="text-gray-700 p-8">{message}</span>
         </div>
       </div>
     )
