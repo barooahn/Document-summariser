@@ -6,6 +6,7 @@ import { SuccessDocsResponse } from '@/app/api/create-docs-from-file/route';
 import { Dropzone, ExtFile, FileMosaic } from '@dropzone-ui/react';
 import { Document } from 'langchain/dist/document';
 import React, { useEffect, useRef, useState } from 'react';
+import { MessageModal } from './ui/MessageModal';
 
 type ServerResponse = {
   success: boolean;
@@ -28,6 +29,7 @@ const PDFUploader: React.FC = () => {
   const [files, setFiles] = useState<ExtFile[]>([]);
   const [chat, setChat] = useState<boolean>(false);
   const [docs, setDocs] = useState<Document<Record<string, any>>[] | []>([]);
+  const [message, setMessage] = useState<string>('');
 
   const createDocsFromFile = async (
     fileName: string
@@ -65,8 +67,10 @@ const PDFUploader: React.FC = () => {
     if (file[0]?.xhr?.status === 200 && file[0]?.xhr?.responseText) {
       const fileNameObj = JSON.parse(file[0]?.xhr?.responseText).payload;
       try {
+        setMessage('Creating docs...');
         const docs = (await createDocsFromFile(fileNameObj.filename)).docs;
         setDocs(docs);
+        setMessage('Creating summary...');
         const response = await fetch('/api/create-document-summary', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -90,6 +94,8 @@ const PDFUploader: React.FC = () => {
     }
   };
 
+  console.log('message', message);
+
   return (
     <>
       <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-8">
@@ -112,6 +118,7 @@ const PDFUploader: React.FC = () => {
           ))}
         </Dropzone>
       </section>
+      <MessageModal message={message} pdfSummary={pdfSummary} />
       {pdfSummary && (
         <>
           <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-4">
