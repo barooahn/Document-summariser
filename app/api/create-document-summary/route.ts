@@ -3,7 +3,7 @@ import { llm } from '../../config';
 import { RetrievalQAChain } from 'langchain/chains';
 import { NextResponse } from 'next/server';
 
-export async function POST(request: Request, response: any) {
+export async function POST(request: Request) {
   try {
     if (request.method !== 'POST') {
       const errorPayload = {
