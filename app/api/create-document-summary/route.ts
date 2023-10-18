@@ -1,14 +1,9 @@
 import { vectorStoreRetriever } from '../../api-helpers/vector-store';
 import { llm } from '../../config';
-import fs from 'fs/promises';
 import { RetrievalQAChain } from 'langchain/chains';
-import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
-import { CharacterTextSplitter } from 'langchain/text_splitter';
 import { NextResponse } from 'next/server';
-import os from 'os';
-import path from 'path';
 
-export async function POST(request: Request, response: any) {
+export async function POST(request: Request) {
   try {
     if (request.method !== 'POST') {
       const errorPayload = {
@@ -27,34 +22,20 @@ export async function POST(request: Request, response: any) {
     console.log('querying chain');
     const chainResponse = await chain.call({
       query:
-        'Summarize the document in 100 words or less.  Format the reply into logical paragraphs using HTML syntax.  Highligh important facts in bold.',
-      callbacks: [
-        {
-          handleLLMNewToken(token: string) {
-            // console.log({ token });
-          }
-        }
-      ]
+        'Summarize the document in 100 words or less.  Format the reply into logical paragraphs using HTML syntax.  Highligh important facts in bold.'
     });
     // const chainResponse2 = await chain.call({
     //   query:
-    //     'list the ten most important points of the document Format the reply into a HTML unordered list ',
-    //   callbacks: [
-    //     {
-    //       handleLLMNewToken(token: string) {
-    //         // console.log({ token });
-    //       }
-    //     }
-    //   ]
+    //     'list the ten most important points of the document. Format the reply into a HTML unordered list.'
     // });
-    // const chainResponse2 = '';
+    const chainResponse2 = '';
 
     const responsePayload = {
       success: true,
       message: 'File was uploaded successfully',
       payload: {
-        chainResponse: chainResponse
-        // chainResponse2: chainResponse2,
+        chainResponse: chainResponse,
+        chainResponse2: chainResponse2
       }
     };
 

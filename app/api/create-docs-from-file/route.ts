@@ -1,26 +1,34 @@
-import fs from 'fs/promises';
+import { Document } from 'langchain/dist/document';
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
 import { CharacterTextSplitter } from 'langchain/text_splitter';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
+import { buffer } from 'stream/consumers';
 
-// Define any additional types you might need
 interface ErrorResponse {
   success: false;
   message: string;
   payload: Record<string, unknown>;
 }
 
-interface SuccessResponse {
+export interface SuccessDocsResponse {
   success: true;
-  result: any; // Replace 'any' with the actual type of your result
+  docs: Document<Record<string, any>>[];
 }
 
-type ApiResponse = ErrorResponse | SuccessResponse;
+async function streamToBuffer(
+  readableStream: ReadableStream<Uint8Array>
+): Promise<Buffer> {
+  const reader = readableStream.getReader();
+  const chunks: Uint8Array[] = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  return Buffer.concat(chunks);
+}
 
-export const POST = async function (
-  req: NextApiRequest,
-  res: NextApiResponse<ApiResponse>
-) {
+export async function POST(req: Request, res: Response) {
   try {
     if (req.method !== 'POST') {
       const errorPayload: ErrorResponse = {
@@ -28,36 +36,57 @@ export const POST = async function (
         message: 'Method not allowed',
         payload: {}
       };
-      return res.status(405).json(errorPayload);
+      return NextResponse.json(errorPayload, { status: 405 });
     }
 
-    const fileName = req.body.fileName as string;
-
-    const pdfLoader = new PDFLoader(fileName);
-    const docsUploaded = await pdfLoader.load();
-
-    const splitter = new CharacterTextSplitter({
-      separator: ' ',
-      chunkSize: 1000,
-      chunkOverlap: 200
-    });
-
-    const result = await splitter.splitDocuments(docsUploaded);
-
-    try {
-      const successResponse: SuccessResponse = {
-        success: true,
-        result
-      };
-      res.status(200).json(successResponse);
-    } catch (error) {
-      console.error(error);
-      const errorResponse: ErrorResponse = {
+    if (req.body === null) {
+      const errorPayload: ErrorResponse = {
         success: false,
-        message: 'Internal Server Error',
+        message: 'Request body cannot be null',
         payload: {}
       };
-      res.status(500).json(errorResponse);
+      return NextResponse.json(errorPayload, { status: 400 });
+    }
+
+    if (req.body instanceof ReadableStream) {
+      const bodyBuffer = await streamToBuffer(req.body);
+      const body = bodyBuffer.toString();
+      const parsedBody = JSON.parse(body);
+      const fileName = parsedBody.fileName;
+
+      const pdfLoader = new PDFLoader(fileName);
+      const docsUploaded = await pdfLoader.load();
+
+      const splitter = new CharacterTextSplitter({
+        separator: ' ',
+        chunkSize: 1000,
+        chunkOverlap: 200
+      });
+
+      const docs = await splitter.splitDocuments(docsUploaded);
+
+      try {
+        const successResponse: SuccessDocsResponse = {
+          success: true,
+          docs
+        };
+        return NextResponse.json(successResponse, { status: 200 });
+      } catch (error) {
+        console.error(error);
+        const errorResponse: ErrorResponse = {
+          success: false,
+          message: 'Internal Server Error',
+          payload: {}
+        };
+        return NextResponse.json(errorResponse, { status: 500 });
+      }
+    } else {
+      const errorPayload: ErrorResponse = {
+        success: false,
+        message: 'Request body is not a readable stream',
+        payload: {}
+      };
+      return NextResponse.json(errorPayload, { status: 400 });
     }
   } catch (error) {
     console.error(error);
@@ -66,6 +95,6 @@ export const POST = async function (
       message: 'Internal Server Error',
       payload: {}
     };
-    res.status(500).json(errorResponse);
+    return NextResponse.json(errorResponse, { status: 500 });
   }
-};
+}

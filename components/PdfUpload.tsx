@@ -1,10 +1,12 @@
 'use client';
 
 import ChatUI from './ChatUI';
+import { MessageModal } from './MessageModal';
 import Button from './ui/Button';
+import { SuccessDocsResponse } from '@/app/api/create-docs-from-file/route';
 import { Dropzone, ExtFile, FileMosaic } from '@dropzone-ui/react';
 import { Document } from 'langchain/dist/document';
-import React, { DOMAttributes, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 type ServerResponse = {
   success: boolean;
@@ -13,18 +15,11 @@ type ServerResponse = {
     chainResponse: {
       text: string;
     };
-    // chainResponse2: {
-    //   text: string;
-    // };
+    chainResponse2: {
+      text: string;
+    };
     collectionName: string;
     docs: Document<Record<string, any>>[];
-  };
-};
-type ServerFileResponse = {
-  success: boolean;
-  message: string;
-  payload: {
-    fileName: string;
   };
 };
 
@@ -33,13 +28,12 @@ const PDFUploader: React.FC = () => {
   const pdfSummaryRef = useRef<HTMLDivElement | null>(null);
   const [files, setFiles] = useState<ExtFile[]>([]);
   const [chat, setChat] = useState<boolean>(false);
-
-  // const collectionName = pdfSummary?.payload?.collectionName || '';
-  const docs = pdfSummary?.payload?.docs;
+  const [docs, setDocs] = useState<Document<Record<string, any>>[] | []>([]);
+  const [message, setMessage] = useState<string>('');
 
   const createDocsFromFile = async (
     fileName: string
-  ): Promise<Document<Record<string, any>>[]> => {
+  ): Promise<SuccessDocsResponse> => {
     try {
       const response = await fetch('/api/create-docs-from-file', {
         method: 'POST',
@@ -54,50 +48,31 @@ const PDFUploader: React.FC = () => {
       }
 
       const data = await response.json();
-      return data as Document<Record<string, any>>[];
+      return data as SuccessDocsResponse;
     } catch (error) {
       console.error(error);
       throw error; // Re-throw the error so it can be handled upstream
     }
   };
 
-  // const handleFilesChange = (incomingFiles: ExtFile[]) => {
-  //   const { uploadStatus, errors, xhr } = incomingFiles[0];
-
-  //   setFiles(incomingFiles);
-  //   if (uploadStatus === 'success' && xhr?.response) {
-  //     try {
-  //       const filesResponse: ServerFileResponse = xhr?.response;
-  //       setFileName(filesResponse);
-
-  //       // const parsedResponse: ServerResponse = JSON.parse(xhr?.response);
-  //       // setPdfSummary(parsedResponse);
-  //     } catch (error) {
-  //       console.error('Failed to get filename response:', error);
-  //       console.error('Response:', xhr?.response);
-  //     }
-  //   }
-  //   if (uploadStatus === 'error') {
-  //     console.error('Upload Error:', xhr?.statusText);
-  //   }
-  //   if (errors) {
-  //     console.log('incomingFiles[0]?.errors', errors);
-  //   }
-  // };
-
   //scroll to summary
   useEffect(() => {
-    if (pdfSummaryRef.current) {
+    if (pdfSummary && pdfSummaryRef?.current) {
+      const barHeight = '40px';
+      pdfSummaryRef.current.style.scrollMargin = barHeight;
       pdfSummaryRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [history]);
+  }, [history, pdfSummary]);
 
   const handleChangeStatus = async (file: ExtFile[]) => {
+    setFiles(file);
     if (file[0]?.xhr?.status === 200 && file[0]?.xhr?.responseText) {
+      const fileNameObj = JSON.parse(file[0]?.xhr?.responseText).payload;
       try {
-        const docs = await createDocsFromFile(
-          JSON.parse(file[0]?.xhr?.responseText).payload
-        );
+        setMessage('Creating docs...');
+        const docs = (await createDocsFromFile(fileNameObj.filename)).docs;
+        setDocs(docs);
+        setMessage('Creating summary...');
         const response = await fetch('/api/create-document-summary', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -121,11 +96,12 @@ const PDFUploader: React.FC = () => {
     }
   };
 
+  console.log('message', message);
+
   return (
     <>
       <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-8">
         <Dropzone
-          // onChange={handleFilesChange}
           maxFiles={1}
           clickable={true}
           accept="application/pdf"
@@ -144,16 +120,22 @@ const PDFUploader: React.FC = () => {
           ))}
         </Dropzone>
       </section>
+      <MessageModal message={message} pdfSummary={pdfSummary} />
       {pdfSummary && (
         <>
-          <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-4">
+          <section
+            ref={pdfSummaryRef}
+            className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-4"
+          >
+            <p className="text-xl py-6 font-extrabold text-pink-500 lg:text-4xl">
+              A summary of your document
+            </p>
             <div
-              ref={pdfSummaryRef}
               dangerouslySetInnerHTML={{
                 __html: pdfSummary.payload.chainResponse?.text
               }}
             />
-            {/* <h2 className="text-2xl my-8 font-extrabold text-pink-500 sm:text-center sm:text-6xl">
+            {/* <h2 className="text-2xl my-8 font-extrabold text-pink-500 sm:text-6xl">
               Key points about the document
             </h2>
             <div
@@ -161,12 +143,12 @@ const PDFUploader: React.FC = () => {
               dangerouslySetInnerHTML={{
                 __html: pdfSummary.payload.chainResponse2?.text
               }}
-            />*/}
+            /> */}
           </section>
           <div className="flex justify-center">
             <Button
               onClick={() => setChat(true)}
-              className={`${'ml-0.5 my-8 relative w-1/2 border border-transparent text-zinc-400'} rounded-md m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 focus:z-10 sm:w-auto sm:px-8`}
+              className={`${'ml-0.5 my-6 relative w-1/2 border border-transparent text-zinc-400'} rounded-md m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 focus:z-10 sm:w-auto sm:px-8`}
             >
               Chat now
             </Button>
@@ -174,7 +156,7 @@ const PDFUploader: React.FC = () => {
         </>
       )}
       {chat && (
-        <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-4">
+        <section className="bg-black max-w-6xl px-4 mx-auto sm:py-4 sm:px-6 lg:px-4">
           <ChatUI docs={docs ?? []} />
         </section>
       )}

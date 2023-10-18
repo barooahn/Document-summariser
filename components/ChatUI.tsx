@@ -8,7 +8,6 @@ import '@/styles/chat-styles.css';
 import { Document } from 'langchain/dist/document';
 
 type ChatUIProps = {
-  // collectionName: string;
   docs: Document<Record<string, any>>[];
 };
 
@@ -20,7 +19,7 @@ export default function ChatUI(props: ChatUIProps) {
       content: 'Hello! Ask me questions about your document.'
     }
   ]);
-  const lastMessageRef = useRef<HTMLDivElement | null>(null);
+  const chatRef = useRef<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [isFocused, setIsFocused] = useState(false);
 
@@ -38,7 +37,6 @@ export default function ChatUI(props: ChatUIProps) {
       body: JSON.stringify({
         query: message,
         history: history,
-        // collectionName: props.collectionName,
         docs: props.docs
       })
     })
@@ -52,32 +50,24 @@ export default function ChatUI(props: ChatUIProps) {
       });
   };
 
-  const formatPageName = (url: string) => {
-    // Split the URL by "/" and get the last segment
-    const pageName = url.split('/').pop();
-
-    // Split by "-" and then join with space
-    if (pageName) {
-      const formattedName = pageName.split('-').join(' ');
-
-      // Capitalize only the first letter of the entire string
-      return formattedName.charAt(0).toUpperCase() + formattedName.slice(1);
-    }
-  };
-
   //scroll to bottom of chat
   useEffect(() => {
-    if (lastMessageRef.current) {
-      lastMessageRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (chatRef.current) {
+      const barHeight = '40px';
+      chatRef.current.style.scrollMargin = barHeight;
+      chatRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [history]);
 
   return (
-    <main className="h-96 bg-black flex flex-col w-full">
-      <div className="flex flex-col gap-8 w-full items-center flex-grow max-h-full">
-        <h1 className="sm:text-2xl lg:text-4xl text-white font-extralight">
+    <section className="h-120 bg-black flex flex-col w-full" ref={chatRef}>
+      <div className="flex flex-col gap-8 w-full flex-grow max-h-full">
+        <p
+          ref={chatRef}
+          className="text-xl pt-6 text-left font-extrabold text-pink-500 lg:text-4xl"
+        >
           Ask me about your document
-        </h1>
+        </p>
         <form
           className="rounded-2xl border-white-700 border-opacity-5 border w-full flex-grow flex flex-col max-h-full overflow-clip"
           onSubmit={(e) => {
@@ -87,12 +77,10 @@ export default function ChatUI(props: ChatUIProps) {
         >
           <div className="overflow-y-auto flex flex-col gap-2 p-4 h-96">
             {history.map((message: Message, idx) => {
-              const isLastMessage = idx === history.length - 1;
               switch (message.role) {
                 case 'assistant':
                   return (
                     <div
-                      ref={isLastMessage ? lastMessageRef : null}
                       key={`chat-wrapper-${idx.toString()}`}
                       className="flex gap-2"
                     >
@@ -101,25 +89,6 @@ export default function ChatUI(props: ChatUIProps) {
                           AI assistant
                         </p>
                         {message.content}
-                        {message.links && (
-                          <div className="mt-4 flex flex-col gap-2">
-                            <p className="text-sm font-medium text-slate-500">
-                              Sources:
-                            </p>
-
-                            {message.links?.map((link) => {
-                              return (
-                                <a
-                                  href={link}
-                                  key={link}
-                                  className="block w-fit px-2 py-1 text-sm  text-pink-700 bg-black-100 rounded"
-                                >
-                                  {formatPageName(link)}
-                                </a>
-                              );
-                            })}
-                          </div>
-                        )}
                       </div>
                     </div>
                   );
@@ -128,7 +97,6 @@ export default function ChatUI(props: ChatUIProps) {
                     <div
                       className="w-auto max-w-xl break-words bg-black rounded-b-xl rounded-tl-xl text-white p-6 self-end"
                       key={`${message.content}-${idx.toString()}`}
-                      ref={isLastMessage ? lastMessageRef : null}
                     >
                       <p className="text-sm font-medium text-pink-500 mb-2">
                         You
@@ -139,7 +107,7 @@ export default function ChatUI(props: ChatUIProps) {
               }
             })}
             {loading && (
-              <div ref={lastMessageRef} className="flex gap-2">
+              <div className="flex gap-2">
                 <div className="w-auto max-w-xl break-words bg-black rounded-b-xl rounded-tr-xl text-white p-6 ">
                   <p className="text-sm font-medium text-pink-500 mb-4">
                     AI assistant
@@ -188,6 +156,6 @@ export default function ChatUI(props: ChatUIProps) {
           </div>
         </form>
       </div>
-    </main>
+    </section>
   );
 }
