@@ -6,7 +6,6 @@ import {
 import PdfUpload from '@/components/PdfUpload';
 import Pricing from '@/components/Pricing';
 import VideoPlayer from '@/components/VideoPlayer';
-import PlayIcon from '@/components/icons/PlayIcon';
 
 export default async function PricingPage() {
   const [session, products, subscription] = await Promise.all([
@@ -26,7 +25,7 @@ export default async function PricingPage() {
       <div className="flex items-center justify-center">
         <VideoPlayer />
       </div>
-      
+
       <PdfUpload />
     </>
   );
