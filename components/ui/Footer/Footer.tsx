@@ -1,7 +1,6 @@
 import Link from 'next/link';
 
-import Logo from '@/components/icons/Logo';
-import GitHub from '@/components/icons/GitHub';
+// import Logo from '@/components/icons/Logo';
 
 export default function Footer() {
   return (
@@ -13,7 +12,7 @@ export default function Footer() {
             className="flex items-center flex-initial font-bold md:mr-24"
           >
             <span className="mr-2 border rounded-full border-zinc-700">
-              <Logo />
+              {/* <Logo /> */}
             </span>
             <span>ACME</span>
           </Link>
@@ -78,16 +77,6 @@ export default function Footer() {
               </Link>
             </li>
           </ul>
-        </div>
-        <div className="flex items-start col-span-1 text-white lg:col-span-6 lg:justify-end">
-          <div className="flex items-center h-10 space-x-6">
-            <a
-              aria-label="Github Repository"
-              href="https://github.com/vercel/nextjs-subscription-payments"
-            >
-              <GitHub />
-            </a>
-          </div>
         </div>
       </div>
       <div className="flex flex-col items-center justify-between py-12 space-y-4 md:flex-row bg-zinc-900">

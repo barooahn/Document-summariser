@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 755.49 124.17">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #ec4899;
+      }
+
+      .cls-2 {
+        fill: none;
+        stroke: #ec4899;
+        stroke-miterlimit: 10;
+        stroke-width: 13px;
+      }
+
+      .cls-3 {
+        fill: #fff;
+        font-family: BaronNeue, 'Baron Neue';
+        font-size: 113.92px;
+        letter-spacing: .02em;
+      }
+    </style>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g>
+      <text class="cls-3" transform="translate(95.43 96.83)"><tspan x="0" y="0">HAT</tspan></text>
+      <g>
+        <path class="cls-2" d="m88.53,60.27c-4.53,18.1-20.89,31.5-40.39,31.5-23,0-41.64-18.64-41.64-41.64S25.14,8.49,48.14,8.49c18.71,0,34.53,12.34,39.78,29.33"/>
+        <polygon class="cls-1" points="22.27 86.57 36.73 94.01 20.2 103.1 22.27 86.57"/>
+      </g>
+      <text class="cls-3" transform="translate(414.98 96.83)"><tspan x="0" y="0">lause</tspan></text>
+      <path class="cls-2" d="m403.8,59.89c-4.53,18.1-20.89,31.5-40.39,31.5-23,0-41.64-18.64-41.64-41.64s18.64-41.64,41.64-41.64c18.71,0,34.53,12.34,39.78,29.33"/>
+      <path class="cls-2" d="m88.53,60.27c-4.53,18.1-20.89,31.5-40.39,31.5-23,0-41.64-18.64-41.64-41.64S25.14,8.49,48.14,8.49c18.71,0,34.53,12.34,39.78,29.33"/>
+    </g>
+  </g>
+</svg>

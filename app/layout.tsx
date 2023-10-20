@@ -10,8 +10,8 @@ export const fetchCache = 'force-no-store';
 export const revalidate = 0;
 
 const meta = {
-  title: 'Next.js Subscription Starter',
-  description: 'Brought to you by Vercel, Stripe, and Supabase.',
+  title: 'Chat Clause',
+  description: 'Use AI to summarize and chat with your documents',
   cardImage: '/og.png',
   robots: 'follow, index',
   favicon: '/favicon.ico',
