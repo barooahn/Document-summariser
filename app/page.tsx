@@ -22,9 +22,6 @@ export default async function PricingPage() {
         products={products}
         subscription={subscription}
       /> */}
-      <div className="flex items-center justify-center">
-        <VideoPlayer />
-      </div>
 
       <PdfUpload />
     </>

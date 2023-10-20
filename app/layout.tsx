@@ -1,5 +1,6 @@
 import SupabaseProvider from './supabase-provider';
 import Footer from '@/components/ui/Footer';
+import { Hero } from '@/components/ui/Hero/Hero';
 import Navbar from '@/components/ui/Navbar';
 import { PropsWithChildren } from 'react';
 import 'styles/main.css';
@@ -54,12 +55,8 @@ export default function RootLayout({
       <body className="bg-black loading">
         <SupabaseProvider>
           <Navbar />
-          <main
-            id="skip"
-            className="min-h-[calc(100dvh-4rem)] md:min-h[calc(100dvh-5rem)]"
-          >
-            {children}
-          </main>
+          <Hero />
+          <main id="skip">{children}</main>
           <Footer />
         </SupabaseProvider>
       </body>
