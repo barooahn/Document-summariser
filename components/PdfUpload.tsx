@@ -100,7 +100,7 @@ const PDFUploader: React.FC = () => {
 
   return (
     <div className="mb-10">
-      <section className="bg-black max-w-6xl px-4 py-1 mx-auto sm:py-4 sm:px-6 lg:px-8">
+      <section className="bg-black max-w-6xl px-2 py-1 mx-auto sm:py-4 sm:px-6 lg:px-8">
         <Dropzone
           maxFiles={1}
           clickable={true}

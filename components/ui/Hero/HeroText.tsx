@@ -3,28 +3,28 @@ import Image from 'next/image';
 
 export function HeroText() {
   return (
-    <div className="">
-      <div className="hidden lg:block mb-4">
+    <div className="my-auto">
+      <div className="hidden lg:block mb-0">
         <Image priority height={50} src={Logo} alt="Chat Clause logo full" />
       </div>
       <div className="">
-        <p className="italic text-xl sm:text-2xl font-bold mb-4">
+        <p className="italic text-xs lg:text-lg xl:text-lg font-bold mb-4">
           Summarise and chat with your documents
         </p>
-        <ul className="list-disc pl-5">
-          <li className="text-lg sm:text-xl mb-2">
+
+          <p className="text-xs lg:text-m xl:text-xl mb-4">
             Welcome to the Future of Legal Document Understanding!
-          </li>
-          <li className="text-lg sm:text-xl mb-2">
+          </p>
+          <p className="text-xs lg:text-m xl:text-xl mb-4">
             Analyze, Decode, and Uncover Hidden Legal Pitfalls with AI!
-          </li>
-          <li className="text-lg sm:text-xl mb-2">
+          </p>
+          <p className="text-xs lg:text-m xl:text-xl mb-4">
             Spotting Hazards, Clarifying Doubts - Your AI Legal Companion!
-          </li>
-          <li className="text-lg sm:text-xl">
+          </p>
+          <p className="text-xs lg:text-m xl:text-xl">
             Empowering You to Make Informed and Safe Legal Decisions!
-          </li>
-        </ul>
+          </p>
+        
       </div>
     </div>
   );
